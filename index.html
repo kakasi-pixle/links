@@ -8,7 +8,7 @@
 <style>
 
 body{
-font-family: Arial, sans-serif;
+font-family:Arial;
 margin:0;
 background:#0f172a;
 color:white;
@@ -28,48 +28,58 @@ width:90%;
 max-width:800px;
 }
 
-.section{
+.box{
 background:#1e293b;
-padding:20px;
-margin-bottom:20px;
+margin-bottom:15px;
 border-radius:12px;
-box-shadow:0 0 10px rgba(0,0,0,0.4);
+overflow:hidden;
 }
 
-.section h2{
-margin-top:0;
-border-bottom:1px solid #334155;
-padding-bottom:10px;
+.title{
+padding:15px;
+cursor:pointer;
+font-weight:bold;
+background:#334155;
+}
+
+.content{
+display:none;
+padding:15px;
 }
 
 .script{
 background:#020617;
-padding:15px;
+margin-top:10px;
 border-radius:10px;
-margin-top:15px;
+overflow:hidden;
 }
 
 .script-title{
-font-weight:bold;
-margin-bottom:8px;
+padding:12px;
+background:#020617;
+cursor:pointer;
+}
+
+.script-content{
+display:none;
+padding:12px;
 }
 
 code{
 display:block;
-background:#020617;
+background:#000;
 padding:10px;
-border-radius:8px;
+border-radius:6px;
 overflow:auto;
 font-size:13px;
 }
 
 button{
 margin-top:10px;
-padding:8px 14px;
+padding:6px 12px;
 border:none;
-border-radius:8px;
+border-radius:6px;
 background:#38bdf8;
-color:black;
 cursor:pointer;
 font-weight:bold;
 }
@@ -91,44 +101,66 @@ text-align:center;
 
 <div class="container">
 
-<div class="section">
-<h2>Scripts</h2>
+<div class="box">
+<div class="title" onclick="toggle(this)">Scripts</div>
+
+<div class="content">
 
 <div class="script">
-<div class="script-title">void ware (99 days)</div>
+<div class="script-title" onclick="toggle(this)">void ware (99 days)</div>
+<div class="script-content">
 <code id="s1">loadstring(game:HttpGet("https://raw.githubusercontent.com/VapeVoidware/VW-Add/main/nightsintheforest.lua", true))()</code>
 <button onclick="copy('s1')">Copy</button>
 </div>
+</div>
 
 <div class="script">
-<div class="script-title">tsp main</div>
+<div class="script-title" onclick="toggle(this)">tsp main</div>
+<div class="script-content">
 <code id="s2">loadstring(game:HttpGet("https://raw.githubusercontent.com/Emerson2-creator/Scripts-Roblox/refs/heads/main/TSBLuna.lua"))()</code>
 <button onclick="copy('s2')">Copy</button>
 </div>
+</div>
 
 <div class="script">
-<div class="script-title">minhat tsp</div>
+<div class="script-title" onclick="toggle(this)">minhat tsp</div>
+<div class="script-content">
 <code id="s3">loadstring(game:HttpGet("\104\116\116\112\115\58\47\47\114\97\119\46\103\105\116\104\117\98\117\115\101\114\99\111\110\116\101\110\116\46\99\111\109\47\109\105\110\104\110\104\97\116\100\101\112\122\97\105\56\45\99\108\111\117\100\47\77\105\110\104\78\104\97\116\45\72\85\66\45\86\51\45\47\114\101\102\115\47\104\101\97\100\115\47\109\97\105\110\47\111\98\102\117\115\99\97\116\101\100\95\115\99\114\105\112\116\45\49\55\53\55\51\51\53\49\49\56\54\53\57\46\108\117\97\46\116\120\116"))()</code>
 <button onclick="copy('s3')">Copy</button>
 </div>
-
 </div>
 
-<div class="section center">
-<h2>Other Links</h2>
-soon 🚧
+</div>
 </div>
 
-<div class="section center">
-<h2>Credits</h2>
+<div class="box">
+<div class="title" onclick="toggle(this)">Other Links</div>
+<div class="content center">
+soon
+</div>
+</div>
+
+<div class="box">
+<div class="title" onclick="toggle(this)">Credits</div>
+<div class="content center">
 <p>dev shawarma need anything ?</p>
 <p>+20 1224807954</p>
 <p>whatsapp only</p>
+</div>
 </div>
 
 </div>
 
 <script>
+
+function toggle(el){
+let next=el.nextElementSibling;
+if(next.style.display==="block"){
+next.style.display="none";
+}else{
+next.style.display="block";
+}
+}
 
 function copy(id){
 let text=document.getElementById(id).innerText;
