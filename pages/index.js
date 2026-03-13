@@ -11,10 +11,9 @@ export default function Home() {
 
   const start = () => {
     setCurrentLink(links[Math.floor(Math.random() * links.length)]);
-    setMoney((prev) => prev + 0.01); // مثال: كل رابط يضيف مبلغ
+    setMoney((prev) => prev + 0.01);
   };
 
-  // تحديث تلقائي كل 60 ثانية
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentLink(links[Math.floor(Math.random() * links.length)]);
@@ -29,13 +28,11 @@ export default function Home() {
       <button onClick={start} style={{ fontSize: "20px", padding: "10px 20px" }}>
         ابدأ
       </button>
-
       <div style={{ marginTop: "20px" }}>
         <p>الرابط الحالي: <a href={currentLink} target="_blank">{currentLink}</a></p>
         <p>الأرباح: ${money.toFixed(2)}</p>
       </div>
-
       <button onClick={start} style={{ marginTop: "20px" }}>تغير الصفحة</button>
     </div>
   );
-          }
+}
