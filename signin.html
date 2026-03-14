@@ -77,7 +77,11 @@ function login(){
     return;
   }
 
-  alert("Logged in successfully!");
+  // حفظ المستخدم الحالي في LocalStorage عشان الداشبورد يعرف مين فاتح
+  localStorage.setItem("currentUser", JSON.stringify(user));
+
+  // التوجيه التلقائي للـ Dashboard
+  window.location.href = "dashboard.html";
 }
 </script>
 
