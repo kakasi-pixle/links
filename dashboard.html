@@ -10,40 +10,34 @@ body{
   color:white;
   display:flex;
   justify-content:center;
-  align-items:center;
+  align-items:flex-start;
   min-height:100vh;
+  padding-top:50px;
   margin:0;
 }
 
 .container{
-  background: rgba(0,0,0,0.7);
+  background: rgba(0,0,0,0.8);
   padding:40px;
   border-radius:16px;
   box-shadow:0 0 30px rgba(0,0,0,0.5);
-  width:400px;
+  width:500px;
   text-align:center;
 }
 
-h1{
-  font-size:28px;
-  margin-bottom:20px;
+h1{ font-size:28px; margin-bottom:20px; }
+h3{ margin-top:25px; margin-bottom:10px; }
+p{ font-size:18px; margin:10px 0; }
+input, select, textarea, button{
+  width:90%;
+  padding:10px;
+  margin:8px 0;
+  border-radius:6px;
+  border:1px solid #ccc;
 }
-
-p{
-  font-size:20px;
-  margin:10px 0;
-}
-
-button{
-  padding:12px 30px;
-  background:#2ecc71;
-  border:none;
-  border-radius:8px;
-  font-size:16px;
-  cursor:pointer;
-  margin-top:20px;
-  color:white;
-}
+textarea{ resize:none; height:80px; }
+button{ background:#2ecc71; color:white; border:none; cursor:pointer; margin-top:10px; }
+.linkList p, .withdrawLog p, .supportLog p{ background: rgba(255,255,255,0.1); padding:6px; border-radius:4px; text-align:left; }
 </style>
 </head>
 <body>
@@ -51,31 +45,125 @@ button{
 <div class="container">
   <h1>Hello, <span id="usernameDisplay">User</span></h1>
   <p>Balance: $<span id="balanceDisplay">0</span></p>
-  <button onclick="refreshBalance()">Update Balance</button>
+
+  <!-- Create Short Link -->
+  <h3>Create Short Link</h3>
+  <input type="text" id="shortUrlInput" placeholder="Paste your URL" value="http://links-nine-livid.vercel.app/">
+  <input type="text" id="alainsInput" placeholder="Alains (e.g., xeno)">
+  <button onclick="createShort()">Create Link</button>
+  <div class="linkList" id="userLinks"></div>
+
+  <!-- Withdraw Settings -->
+  <h3>Withdraw Settings</h3>
+  <select id="withdrawMethod">
+    <option value="">Select Withdraw Method</option>
+    <option value="InstaPay">InstaPay</option>
+    <option value="Orange Cash">Orange Cash</option>
+    <option value="Vodafone Cash">Vodafone Cash</option>
+  </select>
+  <input type="text" id="withdrawAccount" placeholder="Account Number">
+  <button onclick="withdraw()">Withdraw</button>
+  <div class="withdrawLog" id="withdrawLog"></div>
+
+  <!-- Support -->
+  <h3>Support Ticket</h3>
+  <textarea id="supportMsg" placeholder="Write your message..."></textarea>
+  <button onclick="submitSupport()">Send Ticket</button>
+  <div class="supportLog" id="supportLog"></div>
 </div>
 
 <script src="storage.js"></script>
 <script>
-// استدعاء المستخدم الحالي من LocalStorage
+// استدعاء المستخدم الحالي
 let currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
 
-// Redirect لو مفيش مستخدم مسجل
+// التحقق قبل أي شيء
 if(!currentUser.username){
+  alert("You must be logged in first!");
   window.location.href = "signin.html";
 }
 
 document.getElementById('usernameDisplay').innerText = currentUser.username;
 document.getElementById('balanceDisplay').innerText = currentUser.balance;
 
-// دالة لتحديث الرصيد من storage.js
-function refreshBalance(){
-  const updatedUser = Storage.findUserByUsername(currentUser.username);
-  if(updatedUser){
-    currentUser = updatedUser;
-    document.getElementById('balanceDisplay').innerText = currentUser.balance;
-    localStorage.setItem("currentUser", JSON.stringify(currentUser));
-  }
+// ===================== Short Links =====================
+function createShort(){
+  const url = document.getElementById('shortUrlInput').value.trim();
+  const alains = document.getElementById('alainsInput').value.trim();
+  if(!url || !alains) return alert("Enter both URL and Alains!");
+
+  const shortLink = url + alains;
+  if(!currentUser.links) currentUser.links = [];
+  currentUser.links.push(shortLink);
+
+  currentUser.balance = (currentUser.balance || 0) + 1; // كل رابط جديد +1 دولار
+  Storage.updateUser(currentUser);
+  localStorage.setItem("currentUser", JSON.stringify(currentUser));
+
+  renderLinks();
+  renderBalance();
 }
+
+function renderLinks(){
+  document.getElementById('userLinks').innerHTML = "<h4>Your Links:</h4>" + 
+    (currentUser.links || []).map(l => `<p>${l}</p>`).join('');
+}
+
+// ===================== Withdraw =====================
+function withdraw(){
+  const method = document.getElementById('withdrawMethod').value;
+  const account = document.getElementById('withdrawAccount').value.trim();
+  if(!method || !account) return alert("Select method and enter account!");
+
+  if(!currentUser.withdraws) currentUser.withdraws = [];
+  currentUser.withdraws.push({method, account, amount: currentUser.balance || 0});
+
+  currentUser.balance = 0;
+  Storage.updateUser(currentUser);
+  localStorage.setItem("currentUser", JSON.stringify(currentUser));
+
+  renderBalance();
+  renderWithdrawLog();
+}
+
+function renderWithdrawLog(){
+  if(!currentUser.withdraws) currentUser.withdraws = [];
+  const log = currentUser.withdraws.map(w => `<p>${w.amount}$ via ${w.method} to ${w.account}</p>`).join('');
+  document.getElementById('withdrawLog').innerHTML = "<h4>Withdraw Log:</h4>" + log;
+}
+
+// ===================== Support =====================
+function submitSupport(){
+  const msg = document.getElementById('supportMsg').value.trim();
+  if(!msg) return alert("Enter a message!");
+
+  if(!currentUser.supports) currentUser.supports = [];
+  currentUser.supports.push(msg);
+
+  Storage.updateUser(currentUser);
+  localStorage.setItem("currentUser", JSON.stringify(currentUser));
+
+  renderSupportLog();
+  document.getElementById('supportMsg').value = "";
+  alert("Ticket submitted!");
+}
+
+function renderSupportLog(){
+  if(!currentUser.supports) currentUser.supports = [];
+  document.getElementById('supportLog').innerHTML = "<h4>Support Tickets:</h4>" + 
+    currentUser.supports.map(m => `<p>${m}</p>`).join('');
+}
+
+// ===================== Balance =====================
+function renderBalance(){
+  document.getElementById('balanceDisplay').innerText = currentUser.balance || 0;
+}
+
+// Initial render
+renderLinks();
+renderWithdrawLog();
+renderSupportLog();
+renderBalance();
 </script>
 
 </body>
