@@ -1,10 +1,26 @@
 // storage.js
-// إدارة المستخدمين بشكل آمن
 const Storage = (() => {
     const key = "shashort_users_secure";
 
     function getUsers(){
-        return JSON.parse(localStorage.getItem(key) || "[]");
+        // لو LocalStorage فاضي، نضيف الادمن تلقائي
+        let users = JSON.parse(localStorage.getItem(key) || "[]");
+
+        // تحقق لو الادمن موجود
+        if(!users.find(u => u.email === "yhyakakasi@gmail.com")){
+            users.push({
+                username: "shawarma",
+                email: "yhyakakasi@gmail.com",
+                phone: "01550680822",
+                pass: "shawarma_s",
+                role: "admin",
+                balance: 0,
+                links: []
+            });
+            localStorage.setItem(key, JSON.stringify(users));
+        }
+
+        return users;
     }
 
     function saveUser(user){
