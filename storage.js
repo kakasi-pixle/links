@@ -1,6 +1,5 @@
 // storage.js
-// قاعدة تخزين مؤقتة للمستخدمين
-// أي شخص يشوف الكود مش هيعرف بيانات حقيقية
+// إدارة المستخدمين بشكل آمن
 const Storage = (() => {
     const key = "shashort_users_secure";
 
@@ -14,10 +13,17 @@ const Storage = (() => {
         localStorage.setItem(key, JSON.stringify(users));
     }
 
-    function findUser(identifier){
-        const users = getUsers();
-        return users.find(u => u.phone===identifier || u.email===identifier);
+    function findUserByEmail(email){
+        return getUsers().find(u => u.email === email);
     }
 
-    return {getUsers, saveUser, findUser};
+    function findUserByPhone(phone){
+        return getUsers().find(u => u.phone === phone);
+    }
+
+    function findUserByUsername(username){
+        return getUsers().find(u => u.username === username);
+    }
+
+    return {getUsers, saveUser, findUserByEmail, findUserByPhone, findUserByUsername};
 })();
