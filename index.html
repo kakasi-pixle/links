@@ -1,35 +1,41 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>Shashort - Sign Up</title>
 <style>
-body{
-  font-family: Arial;
-  background: #f4f4f4;
+body {
+  font-family: Arial, sans-serif;
+  background: #f0f2f5;
   display:flex;
   justify-content:center;
   align-items:center;
   height:100vh;
 }
+
 .container{
   background:white;
   padding:30px;
   border-radius:12px;
-  box-shadow:0 0 15px rgba(0,0,0,0.2);
+  box-shadow:0 0 20px rgba(0,0,0,0.2);
   width:400px;
   text-align:center;
 }
-h1{ margin-bottom:20px; }
+
+h1{
+  margin-bottom:20px;
+}
+
 input{
-  width:80%;
+  width:90%;
   padding:10px;
-  margin:10px 0;
-  border-radius:5px;
+  margin:8px 0;
+  border-radius:6px;
   border:1px solid #ccc;
 }
+
 button{
-  padding:10px 30px;
+  padding:12px 40px;
   background:#2ecc71;
   border:none;
   border-radius:6px;
@@ -38,6 +44,7 @@ button{
   cursor:pointer;
   margin-top:10px;
 }
+
 .notice{
   background:#f9edbe;
   padding:10px;
@@ -51,37 +58,67 @@ button{
 <body>
 
 <div class="container">
-  <h1>Shashort - Sign Up</h1>
+  <h1>Create Your Account</h1>
   <div class="notice">
     المنصة تستعمل: Vodafone Cash, Orange Cash, WePay, InstaPay فقط
   </div>
 
-  <input type="text" id="signupName" placeholder="اسمك الكامل" required>
-  <input type="text" id="signupWhatsapp" placeholder="رقم واتساب" required>
-  <input type="password" id="signupPass" placeholder="كلمة المرور" required>
-  <button onclick="signup()">Sign Up</button>
-  <p>لديك حساب؟ <a href="signin.html">Login</a></p>
+  <input type="text" id="username" placeholder="Username" required>
+  <input type="email" id="email" placeholder="Email" required>
+  <input type="text" id="phone" placeholder="Phone" required>
+  <input type="password" id="password" placeholder="Password" required>
+  <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
+  <button onclick="createAccount()">Create Account</button>
+
+  <p>Already have an account? <a href="signin.html">Login</a></p>
 </div>
 
 <script src="storage.js"></script>
 <script>
-function signup(){
-  const name = document.getElementById('signupName').value;
-  const whatsapp = document.getElementById('signupWhatsapp').value;
-  const pass = document.getElementById('signupPass').value;
+function createAccount(){
+  const username = document.getElementById('username').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const password = document.getElementById('password').value;
+  const confirmPassword = document.getElementById('confirmPassword').value;
 
-  if(!name || !whatsapp || !pass){
-    alert("اكمل كل البيانات!");
+  if(!username || !email || !phone || !password || !confirmPassword){
+    alert("Complete all fields!");
     return;
   }
 
-  if(Storage.findUser(whatsapp)){
-    alert("رقم الواتساب مستخدم من قبل!");
+  if(password !== confirmPassword){
+    alert("Passwords do not match!");
     return;
   }
 
-  Storage.saveUser({phone:whatsapp, name:name, pass:pass, role:"user", balance:0, links:[]});
-  alert("تم التسجيل بنجاح!");
+  if(Storage.findUserByUsername(username)){
+    alert("Username already taken!");
+    return;
+  }
+
+  if(Storage.findUserByEmail(email)){
+    alert("Email already used!");
+    return;
+  }
+
+  if(Storage.findUserByPhone(phone)){
+    alert("Phone already used!");
+    return;
+  }
+
+  const user = {
+    username,
+    email,
+    phone,
+    pass: password,
+    role: "user",
+    balance:0,
+    links:[]
+  };
+
+  Storage.saveUser(user);
+  alert("Account created successfully!");
   window.location.href = "signin.html";
 }
 </script>
