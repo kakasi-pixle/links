@@ -93,7 +93,7 @@ textarea{ resize:none; height:70px; }
       <option value="Vodafone Cash">Vodafone Cash</option>
     </select>
     <input type="text" id="withdrawAccount" placeholder="Account Number">
-    <button onclick="withdraw()">Withdraw</button>
+    <button onclick="withdraw()">Submit Withdraw</button>
     <div class="withdrawLog" id="withdrawLog"></div>
   </div>
 
@@ -118,7 +118,7 @@ if(!currentUser.username){
 }
 
 document.getElementById('usernameDisplay').innerText = currentUser.username;
-document.getElementById('balanceDisplay').innerText = currentUser.balance;
+document.getElementById('balanceDisplay').innerText = currentUser.balance || 0;
 
 // ===================== Navigation =====================
 function showSection(sectionId, btn){
@@ -139,12 +139,11 @@ function createShort(){
   if(!currentUser.links) currentUser.links = [];
   currentUser.links.push(shortLink);
 
-  currentUser.balance = (currentUser.balance || 0) + 1;
+  // لا نضيف أي دولار تلقائي
   Storage.updateUser(currentUser);
   localStorage.setItem("currentUser", JSON.stringify(currentUser));
 
   renderLinks();
-  renderBalance();
 }
 
 function renderLinks(){
@@ -159,19 +158,25 @@ function withdraw(){
   if(!method || !account) return alert("Select method and enter account!");
 
   if(!currentUser.withdraws) currentUser.withdraws = [];
-  currentUser.withdraws.push({method, account, amount: currentUser.balance || 0});
+  currentUser.withdraws.push({
+    method, 
+    account, 
+    amount: 0, // الرصيد ليس مضاف حتى تحدده أنت لاحقًا
+    status: "Pending"
+  });
 
-  currentUser.balance = 0;
   Storage.updateUser(currentUser);
   localStorage.setItem("currentUser", JSON.stringify(currentUser));
 
-  renderBalance();
   renderWithdrawLog();
+  renderBalance();
 }
 
 function renderWithdrawLog(){
   if(!currentUser.withdraws) currentUser.withdraws = [];
-  const log = currentUser.withdraws.map(w => `<p>${w.amount}$ via ${w.method} to ${w.account}</p>`).join('');
+  const log = currentUser.withdraws.map((w,i) => 
+    `<p>#${i+1}: ${w.amount}$ via ${w.method} to ${w.account} - <strong>${w.status}</strong></p>`
+  ).join('');
   document.getElementById('withdrawLog').innerHTML = "<h4>Withdraw Log:</h4>" + log;
 }
 
