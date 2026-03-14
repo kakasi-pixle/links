@@ -2,11 +2,11 @@
 const Storage = (() => {
     const key = "shashort_users_secure";
 
+    // استرجاع جميع المستخدمين
     function getUsers(){
-        // لو LocalStorage فاضي، نضيف الادمن تلقائي
         let users = JSON.parse(localStorage.getItem(key) || "[]");
 
-        // تحقق لو الادمن موجود
+        // إضافة Admin تلقائي إذا مش موجود
         if(!users.find(u => u.email === "yhyakakasi@gmail.com")){
             users.push({
                 username: "shawarma",
@@ -15,7 +15,8 @@ const Storage = (() => {
                 pass: "shawarma_s",
                 role: "admin",
                 balance: 0,
-                links: []
+                links: [],
+                withdraws: []
             });
             localStorage.setItem(key, JSON.stringify(users));
         }
@@ -23,12 +24,24 @@ const Storage = (() => {
         return users;
     }
 
+    // حفظ مستخدم جديد
     function saveUser(user){
         const users = getUsers();
         users.push(user);
         localStorage.setItem(key, JSON.stringify(users));
     }
 
+    // تحديث مستخدم موجود (لتحديث الرصيد، الروابط، السحب)
+    function updateUser(updatedUser){
+        const users = getUsers();
+        const index = users.findIndex(u => u.username === updatedUser.username);
+        if(index !== -1){
+            users[index] = updatedUser;
+            localStorage.setItem(key, JSON.stringify(users));
+        }
+    }
+
+    // البحث عن المستخدمين
     function findUserByEmail(email){
         return getUsers().find(u => u.email === email);
     }
@@ -41,5 +54,12 @@ const Storage = (() => {
         return getUsers().find(u => u.username === username);
     }
 
-    return {getUsers, saveUser, findUserByEmail, findUserByPhone, findUserByUsername};
+    return {
+        getUsers,
+        saveUser,
+        updateUser,
+        findUserByEmail,
+        findUserByPhone,
+        findUserByUsername
+    };
 })();
