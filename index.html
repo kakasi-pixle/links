@@ -25,27 +25,36 @@ button{ padding:10px 20px; margin:10px; cursor:pointer; background:#3498db; colo
 </div>
 
 <script>
-// 5 صور فوق + 5 صور تحت
+// روابط صور HTTPS ثابتة
 let topImages = [
-  "https://via.placeholder.com/80?text=1",
-  "https://via.placeholder.com/80?text=2",
-  "https://via.placeholder.com/80?text=3",
-  "https://via.placeholder.com/80?text=4",
-  "https://via.placeholder.com/80?text=5"
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3c/Shaki_waterfall.jpg/120px-Shaki_waterfall.jpg",
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Wikipedia-logo-v2-en.svg/120px-Wikipedia-logo-v2-en.svg.png",
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/June_odd-eyed-cat.jpg/120px-June_odd-eyed-cat.jpg",
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/PNG_transparency_demonstration_1.png/120px-PNG_transparency_demonstration_1.png",
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Wikipedia-logo-en-big.png/120px-Wikipedia-logo-en-big.png"
 ];
+
 let bottomImages = [
-  "https://via.placeholder.com/80?text=6",
-  "https://via.placeholder.com/80?text=7",
-  "https://via.placeholder.com/80?text=8",
-  "https://via.placeholder.com/80?text=9",
-  "https://via.placeholder.com/80?text=10"
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Google_Images_2015_logo.svg/120px-Google_Images_2015_logo.svg.png",
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/6/63/Wikipedia-logo.png/120px-Wikipedia-logo.png",
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Example_image.png/120px-Example_image.png",
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Blue_PNG_example.png/120px-Blue_PNG_example.png",
+  "https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Example.jpg/120px-Example.jpg"
 ];
 
 let adsTop = document.getElementById("adsTop");
 let adsBottom = document.getElementById("adsBottom");
 
-topImages.forEach(src=>{ let img=document.createElement("img"); img.src=src; adsTop.appendChild(img); });
-bottomImages.forEach(src=>{ let img=document.createElement("img"); img.src=src; adsBottom.appendChild(img); });
+topImages.forEach(src=>{
+  let img=document.createElement("img");
+  img.src=src;
+  adsTop.appendChild(img);
+});
+bottomImages.forEach(src=>{
+  let img=document.createElement("img");
+  img.src=src;
+  adsBottom.appendChild(img);
+});
 
 // الروابط
 let smartLink = "https://www.effectivegatecpm.com/abue3ptame?key=6d93c92516e484a867b73322e5d9db48";
