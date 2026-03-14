@@ -1,19 +1,25 @@
-ض<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <title>Short Link Flow</title>
 <style>
 body{ font-family: Arial; display:flex; justify-content:center; align-items:center; height:100vh; background:#f0f2f5; margin:0;}
-.container{ background:white; padding:30px; border-radius:12px; box-shadow:0 0 20px rgba(0,0,0,0.2); width:550px; text-align:center; }
+.container{ background:white; padding:30px; border-radius:12px; box-shadow:0 0 20px rgba(0,0,0,0.2); width:600px; text-align:center; }
 h1{ margin-bottom:10px; }
 p{ margin-bottom:15px; font-size:18px; }
 img{ width:80px; height:80px; margin:5px; }
 button{ padding:10px 20px; margin-top:10px; cursor:pointer; background:#3498db; color:white; border:none; border-radius:6px; }
 #countdown{ font-size:20px; font-weight:bold; margin-bottom:10px; }
+.topButtons{ position:absolute; top:10px; right:10px;}
+.topButtons button{ margin-left:5px; }
 </style>
 </head>
 <body>
+<div class="topButtons">
+  <button onclick="openWithdraw()">Withdraw</button>
+  <button onclick="openSupport()">Support</button>
+</div>
 
 <div class="container" id="flowContainer">
   <h1 id="stageTitle">Your link is ready</h1>
@@ -24,81 +30,69 @@ button{ padding:10px 20px; margin-top:10px; cursor:pointer; background:#3498db; 
 
 <script src="storage.js"></script>
 <script>
-// المستخدم الحالي
 let currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
-if(!currentUser.username){
-  alert("You must be logged in!");
-  window.location.href = "signin.html";
-}
+if(!currentUser.username){ alert("Login required"); window.location.href="signin.html"; }
 
-// الرابط الأصلي الذي وضّعه المستخدم
 let destinationUrl = localStorage.getItem("destinationUrl") || "https://tiktok.com";
+let currentAlains = localStorage.getItem("currentAlains") || "link";
 
-// إعداد المراحل
 let stages = [
-  {title:"Your link is ready", images:["https://via.placeholder.com/80x80?text=Ad1","https://via.placeholder.com/80x80?text=Ad2"], smartLink:"https://www.effectivegatecpm.com/abue3ptame?key=6d93c92516e484a867b73322e5d9db48"},
-  {title:"Your link is almost here", images:["https://via.placeholder.com/80x80?text=Ad3","https://via.placeholder.com/80x80?text=Ad4"], smartLink:"https://www.effectivegatecpm.com/abue3ptame?key=6d93c92516e484a867b73322e5d9db48"},
-  {title:"You are near", images:["https://via.placeholder.com/80x80?text=Ad5","https://via.placeholder.com/80x80?text=Ad6","https://via.placeholder.com/80x80?text=Ad7"], smartLink:"https://www.effectivegatecpm.com/abue3ptame?key=6d93c92516e484a867b73322e5d9db48"},
-  {title:"Last one", images:["https://via.placeholder.com/80x80?text=Ad8","https://via.placeholder.com/80x80?text=Ad9","https://via.placeholder.com/80x80?text=Ad10","https://via.placeholder.com/80x80?text=Ad11","https://via.placeholder.com/80x80?text=Ad12"], smartLink:"https://www.effectivegatecpm.com/abue3ptame?key=6d93c92516e484a867b73322e5d9db48"}
+  {title:"Your link is ready", images:["https://via.placeholder.com/80?text=Ad1","https://via.placeholder.com/80?text=Ad2"], smartLink:"https://www.effectivegatecpm.com/abue3ptame?key=6d93c92516e484a867b73322e5d9db48"},
+  {title:"Your link is almost here", images:["https://via.placeholder.com/80?text=Ad3","https://via.placeholder.com/80?text=Ad4"], smartLink:"https://www.effectivegatecpm.com/abue3ptame?key=6d93c92516e484a867b73322e5d9db48"},
+  {title:"You are near", images:["https://via.placeholder.com/80?text=Ad5","https://via.placeholder.com/80?text=Ad6","https://via.placeholder.com/80?text=Ad7"], smartLink:"https://www.effectivegatecpm.com/abue3ptame?key=6d93c92516e484a867b73322e5d9db48"},
+  {title:"Last one", images:["https://via.placeholder.com/80?text=Ad8","https://via.placeholder.com/80?text=Ad9","https://via.placeholder.com/80?text=Ad10","https://via.placeholder.com/80?text=Ad11","https://via.placeholder.com/80?text=Ad12"], smartLink:"https://www.effectivegatecpm.com/abue3ptame?key=6d93c92516e484a867b73322e5d9db48"}
 ];
 
-let currentStage = 0;
-let countdownSec = 10;
-let countdownEl = document.getElementById("countdown");
-let stageTitleEl = document.getElementById("stageTitle");
-let adsContainer = document.getElementById("adsContainer");
-let nextBtn = document.getElementById("nextBtn");
+let currentStage=0;
+let countdownSec=10;
+let countdownEl=document.getElementById("countdown");
+let stageTitleEl=document.getElementById("stageTitle");
+let adsContainer=document.getElementById("adsContainer");
+let nextBtn=document.getElementById("nextBtn");
 
-// عرض الصور والإعلانات
 function renderAds(images){
-  adsContainer.innerHTML = "";
-  images.forEach(src=>{
-    let img = document.createElement("img");
-    img.src = src;
-    adsContainer.appendChild(img);
-  });
+  adsContainer.innerHTML="";
+  images.forEach(src=>{ let img=document.createElement("img"); img.src=src; adsContainer.appendChild(img); });
 }
 
-// العد التنازلي 10 ثواني
 function startCountdown(){
-  countdownSec = 10;
-  countdownEl.innerText = countdownSec;
+  countdownSec=10;
+  countdownEl.innerText=countdownSec;
   nextBtn.style.display="none";
-  let timer = setInterval(()=>{
+  let timer=setInterval(()=>{
     countdownSec--;
-    countdownEl.innerText = countdownSec;
-    if(countdownSec<=0){
-      clearInterval(timer);
-      nextBtn.style.display="inline-block";
-    }
+    countdownEl.innerText=countdownSec;
+    if(countdownSec<=0){ clearInterval(timer); nextBtn.style.display="inline-block"; }
   },1000);
 }
 
-// الانتقال للمرحلة التالية
 function nextStage(){
-  // فتح Smart Link / Pop-under
+  // Smart Link / Pop-under
   window.open(stages[currentStage].smartLink,"_blank");
 
   currentStage++;
   if(currentStage>=stages.length){
-    // نهاية المراحل -> إضافة الرصيد
+    // إضافة رصيد بعد الأربع مراحل
     currentUser.balance = (currentUser.balance || 0) + 0.010;
     Storage.updateUser(currentUser);
     localStorage.setItem("currentUser", JSON.stringify(currentUser));
-    alert("All stages completed! $0.010 added to your account.");
-    window.location.href = destinationUrl; // تحويل للرابط الأصلي
+    alert("Completed all stages! $0.010 added to your account.");
+    window.location.href = destinationUrl;
   } else {
-    stageTitleEl.innerText = stages[currentStage].title;
+    stageTitleEl.innerText=stages[currentStage].title;
     renderAds(stages[currentStage].images);
     startCountdown();
   }
 }
 
+// Withdraw و Support
+function openWithdraw(){ alert("Withdraw Page (Pending/Select method)"); }
+function openSupport(){ alert("Support Ticket Page"); }
+
 // بدء المرحلة الأولى
-stageTitleEl.innerText = stages[0].title;
+stageTitleEl.innerText=stages[0].title;
 renderAds(stages[0].images);
 startCountdown();
 </script>
-
 </body>
 </html>
