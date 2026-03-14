@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Shashort - Sign In</title>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f0f2f5;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+
+.container{
+  background:white;
+  padding:30px;
+  border-radius:12px;
+  box-shadow:0 0 20px rgba(0,0,0,0.2);
+  width:400px;
+  text-align:center;
+}
+
+h1{
+  margin-bottom:20px;
+}
+
+input{
+  width:90%;
+  padding:10px;
+  margin:8px 0;
+  border-radius:6px;
+  border:1px solid #ccc;
+}
+
+button{
+  padding:12px 40px;
+  background:#3498db;
+  border:none;
+  border-radius:6px;
+  color:white;
+  font-size:16px;
+  cursor:pointer;
+  margin-top:10px;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Sign In</h1>
+
+  <input type="text" id="userInput" placeholder="Username or Email or Phone" required>
+  <input type="password" id="password" placeholder="Password" required>
+  <button onclick="login()">Login</button>
+  <p>Don't have an account? <a href="index.html">Sign Up</a></p>
+</div>
+
+<script src="storage.js"></script>
+<script>
+function login(){
+  const input = document.getElementById('userInput').value.trim();
+  const pass = document.getElementById('password').value;
+
+  if(!input || !pass){
+    alert("Complete all fields!");
+    return;
+  }
+
+  const user = Storage.getUsers().find(u => 
+    (u.username === input || u.email === input || u.phone === input) && u.pass === pass
+  );
+
+  if(!user){
+    alert("Incorrect credentials!");
+    return;
+  }
+
+  // بعد تسجيل الدخول
+  if(user.role === "admin"){
+    openAdminDashboard(user);
+  } else {
+    openUserDashboard(user);
+  }
+}
+
+// لوحة تحكم Admin بسيطة
+function openAdminDashboard(user){
+  let html = `<h2>Welcome Admin: ${user.username}</h2>`;
+  html += `<p>Balance: ${user.balance}</p>`;
+  html += `<h3>All Users:</h3>`;
+  const allUsers = Storage.getUsers();
+  html += allUsers.map(u => `<p>${u.username} | ${u.email} | ${u.phone} | Role: ${u.role}</p>`).join('');
+  document.body.innerHTML = html;
+}
+
+// لوحة تحكم المستخدم
+function openUserDashboard(user){
+  let html = `<h2>Welcome: ${user.username}</h2>`;
+  html += `<p>Balance: ${user.balance}</p>`;
+  html += `<h3>Create Short Link</h3>`;
+  html += `<input type="text" id="shortLinkInput" placeholder="Paste your URL" value="http://links-nine-livid.vercel.app/">`;
+  html += `<button onclick="createShort('${user.username}')">Create Short Link</button>`;
+  html += `<div id="userLinks"></div>`;
+  document.body.innerHTML = html;
+}
+
+// إنشاء روابط مختصرة للمستخدم
+function createShort(userKey){
+  const url = document.getElementById('shortLinkInput').value;
+  if(!url) return alert("Enter URL!");
+
+  const shortUrl = url + "?alains=" + Math.random().toString(36).substring(2,8);
+  alert("Short Link created: " + shortUrl);
+
+  const users = Storage.getUsers();
+  const user = users.find(u => u.username === userKey);
+  user.links.push(shortUrl);
+  localStorage.setItem("shashort_users_secure", JSON.stringify(users));
+
+  document.getElementById('userLinks').innerHTML = "<h4>Your Links:</h4>" + user.links.map(l => `<p>${l}</p>`).join('');
+}
+</script>
+
+</body>
+</html>
