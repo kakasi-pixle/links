@@ -5,7 +5,7 @@
 <title>Shashort - Dashboard</title>
 <style>
 body{ font-family: Arial; background:#f0f2f5; display:flex; justify-content:center; padding-top:30px; }
-.container{ background:white; padding:30px; border-radius:12px; box-shadow:0 0 20px rgba(0,0,0,0.2); width:550px; text-align:center;}
+.container{ background:white; padding:30px; border-radius:12px; box-shadow:0 0 20px rgba(0,0,0,0.2); width:600px; text-align:center;}
 h1,h2{ margin:10px 0; }
 button{ padding:10px 20px; margin:5px; border:none; border-radius:6px; background:#3498db; color:white; cursor:pointer; }
 input{ width:90%; padding:8px; margin:6px 0; border-radius:6px; border:1px solid #ccc; }
@@ -35,13 +35,14 @@ if(!currentUser.username){
 document.getElementById('usernameDisplay').innerText = currentUser.username;
 document.getElementById('balanceDisplay').innerText = currentUser.balance || 0;
 
-// إنشاء رابط مختصر
+// إنشاء رابط Short Link حقيقي
 function createLink(){
   let url = document.getElementById('urlInput').value.trim();
   let alains = document.getElementById('alainsInput').value.trim();
   if(!url || !alains) return alert("Enter both URL and Alains!");
 
-  let shortLink = "linkflow.html?alains="+encodeURIComponent(alains)+"&destination="+encodeURIComponent(url);
+  // الرابط الحقيقي على الموقع
+  let shortLink = "https://links-nine-livid.vercel.app/" + encodeURIComponent(alains);
 
   if(!currentUser.links) currentUser.links=[];
   currentUser.links.push({shortLink, original:url, alains});
@@ -52,7 +53,7 @@ function createLink(){
   renderLinks();
 }
 
-// عرض الروابط
+// عرض قائمة الروابط
 function renderLinks(){
   const container = document.getElementById('userLinks');
   container.innerHTML = "<h4>Your Links:</h4>";
@@ -60,8 +61,10 @@ function renderLinks(){
     let p = document.createElement("p");
     p.innerText = l.alains + " → " + l.original;
     p.onclick = ()=>{
+      // عند الضغط نجهز Flow الصفحة
       localStorage.setItem("destinationUrl", l.original);
-      window.open(l.shortLink,"_blank");
+      localStorage.setItem("currentAlains", l.alains);
+      window.location.href = "linkflow.html"; // فتح Flow
     };
     container.appendChild(p);
   });
