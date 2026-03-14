@@ -4,215 +4,70 @@
 <meta charset="UTF-8">
 <title>Shashort - Dashboard</title>
 <style>
-body{
-  font-family: Arial, sans-serif;
-  background:#f0f2f5;
-  display:flex;
-  justify-content:center;
-  align-items:flex-start;
-  min-height:100vh;
-  padding-top:30px;
-  margin:0;
-}
-
-.container{
-  background:white;
-  padding:30px;
-  border-radius:16px;
-  box-shadow:0 0 20px rgba(0,0,0,0.2);
-  width:500px;
-  text-align:center;
-}
-
-h1{ font-size:26px; margin-bottom:10px; }
-p{ font-size:18px; margin:6px 0; }
-
-button{
-  padding:10px 20px;
-  margin:5px;
-  border:none;
-  border-radius:8px;
-  cursor:pointer;
-  font-size:15px;
-  background:#3498db;
-  color:white;
-}
-
-.activeTab{
-  background:#2ecc71 !important;
-}
-
-/* hide sections by default */
-.section{ display:none; text-align:left; margin-top:20px; }
-
-input, select, textarea{
-  width:95%;
-  padding:8px;
-  margin:6px 0;
-  border-radius:6px;
-  border:1px solid #ccc;
-}
-textarea{ resize:none; height:70px; }
-
-.linkList p, .withdrawLog p, .supportLog p{ 
-  background: rgba(0,0,0,0.05); 
-  padding:6px; 
-  border-radius:4px; 
-  margin:4px 0; 
-}
+body{ font-family: Arial; background:#f0f2f5; display:flex; justify-content:center; padding-top:30px; }
+.container{ background:white; padding:30px; border-radius:12px; box-shadow:0 0 20px rgba(0,0,0,0.2); width:550px; text-align:center;}
+h1,h2{ margin:10px 0; }
+button{ padding:10px 20px; margin:5px; border:none; border-radius:6px; background:#3498db; color:white; cursor:pointer; }
+input{ width:90%; padding:8px; margin:6px 0; border-radius:6px; border:1px solid #ccc; }
+.linkList p{ background: rgba(0,0,0,0.05); padding:6px; border-radius:4px; margin:4px 0; cursor:pointer; }
 </style>
 </head>
 <body>
-
 <div class="container">
-  <h1>Hello, <span id="usernameDisplay">User</span></h1>
-  <p>Balance: $<span id="balanceDisplay">0</span></p>
+  <h1>Hello, <span id="usernameDisplay"></span></h1>
+  <h2>Balance: $<span id="balanceDisplay">0</span></h2>
 
-  <!-- Navigation Buttons -->
-  <div>
-    <button id="btnLinks" class="activeTab" onclick="showSection('linksSection', this)">Create Link</button>
-    <button id="btnWithdraw" onclick="showSection('withdrawSection', this)">Withdraw</button>
-    <button id="btnSupport" onclick="showSection('supportSection', this)">Support</button>
-  </div>
+  <h3>Create Short Link</h3>
+  <input type="text" id="urlInput" placeholder="Enter full URL (e.g., https://tiktok.com)">
+  <input type="text" id="alainsInput" placeholder="Alains (e.g., xeno)">
+  <button onclick="createLink()">Create Link</button>
 
-  <!-- Sections -->
-  <div id="linksSection" class="section" style="display:block;">
-    <h3>Create Short Link</h3>
-    <input type="text" id="shortUrlInput" placeholder="Paste your URL" value="http://links-nine-livid.vercel.app/">
-    <input type="text" id="alainsInput" placeholder="Alains (e.g., xeno)">
-    <button onclick="createShort()">Create Link</button>
-    <div class="linkList" id="userLinks"></div>
-  </div>
-
-  <div id="withdrawSection" class="section">
-    <h3>Withdraw Settings</h3>
-    <select id="withdrawMethod">
-      <option value="">Select Withdraw Method</option>
-      <option value="InstaPay">InstaPay</option>
-      <option value="Orange Cash">Orange Cash</option>
-      <option value="Vodafone Cash">Vodafone Cash</option>
-    </select>
-    <input type="text" id="withdrawAccount" placeholder="Account Number">
-    <button onclick="withdraw()">Submit Withdraw</button>
-    <div class="withdrawLog" id="withdrawLog"></div>
-  </div>
-
-  <div id="supportSection" class="section">
-    <h3>Support Ticket</h3>
-    <textarea id="supportMsg" placeholder="Write your message..."></textarea>
-    <button onclick="submitSupport()">Send Ticket</button>
-    <div class="supportLog" id="supportLog"></div>
-  </div>
-
+  <div class="linkList" id="userLinks"></div>
 </div>
 
 <script src="storage.js"></script>
 <script>
-// المستخدم الحالي
 let currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
-
-// التحقق قبل أي شيء
 if(!currentUser.username){
-  alert("You must be logged in first!");
-  window.location.href = "signin.html";
+  alert("Login required");
+  window.location.href="signin.html";
 }
-
 document.getElementById('usernameDisplay').innerText = currentUser.username;
 document.getElementById('balanceDisplay').innerText = currentUser.balance || 0;
 
-// ===================== Navigation =====================
-function showSection(sectionId, btn){
-  document.querySelectorAll('.section').forEach(s => s.style.display='none');
-  document.getElementById(sectionId).style.display='block';
-
-  document.querySelectorAll('button').forEach(b => b.classList.remove('activeTab'));
-  btn.classList.add('activeTab');
-}
-
-// ===================== Short Links =====================
-function createShort(){
-  const url = document.getElementById('shortUrlInput').value.trim();
-  const alains = document.getElementById('alainsInput').value.trim();
+// إنشاء رابط مختصر
+function createLink(){
+  let url = document.getElementById('urlInput').value.trim();
+  let alains = document.getElementById('alainsInput').value.trim();
   if(!url || !alains) return alert("Enter both URL and Alains!");
 
-  const shortLink = url + alains;
-  if(!currentUser.links) currentUser.links = [];
-  currentUser.links.push(shortLink);
+  let shortLink = "linkflow.html?alains="+encodeURIComponent(alains)+"&destination="+encodeURIComponent(url);
 
-  // لا نضيف أي دولار تلقائي
+  if(!currentUser.links) currentUser.links=[];
+  currentUser.links.push({shortLink, original:url, alains});
+
   Storage.updateUser(currentUser);
   localStorage.setItem("currentUser", JSON.stringify(currentUser));
 
   renderLinks();
 }
 
+// عرض الروابط
 function renderLinks(){
-  document.getElementById('userLinks').innerHTML = "<h4>Your Links:</h4>" + 
-    (currentUser.links || []).map(l => `<p>${l}</p>`).join('');
-}
-
-// ===================== Withdraw =====================
-function withdraw(){
-  const method = document.getElementById('withdrawMethod').value;
-  const account = document.getElementById('withdrawAccount').value.trim();
-  if(!method || !account) return alert("Select method and enter account!");
-
-  if(!currentUser.withdraws) currentUser.withdraws = [];
-  currentUser.withdraws.push({
-    method, 
-    account, 
-    amount: 0, // الرصيد ليس مضاف حتى تحدده أنت لاحقًا
-    status: "Pending"
+  const container = document.getElementById('userLinks');
+  container.innerHTML = "<h4>Your Links:</h4>";
+  (currentUser.links||[]).forEach((l,index)=>{
+    let p = document.createElement("p");
+    p.innerText = l.alains + " → " + l.original;
+    p.onclick = ()=>{
+      localStorage.setItem("destinationUrl", l.original);
+      window.open(l.shortLink,"_blank");
+    };
+    container.appendChild(p);
   });
-
-  Storage.updateUser(currentUser);
-  localStorage.setItem("currentUser", JSON.stringify(currentUser));
-
-  renderWithdrawLog();
-  renderBalance();
 }
 
-function renderWithdrawLog(){
-  if(!currentUser.withdraws) currentUser.withdraws = [];
-  const log = currentUser.withdraws.map((w,i) => 
-    `<p>#${i+1}: ${w.amount}$ via ${w.method} to ${w.account} - <strong>${w.status}</strong></p>`
-  ).join('');
-  document.getElementById('withdrawLog').innerHTML = "<h4>Withdraw Log:</h4>" + log;
-}
-
-// ===================== Support =====================
-function submitSupport(){
-  const msg = document.getElementById('supportMsg').value.trim();
-  if(!msg) return alert("Enter a message!");
-
-  if(!currentUser.supports) currentUser.supports = [];
-  currentUser.supports.push(msg);
-
-  Storage.updateUser(currentUser);
-  localStorage.setItem("currentUser", JSON.stringify(currentUser));
-
-  renderSupportLog();
-  document.getElementById('supportMsg').value = "";
-  alert("Ticket submitted!");
-}
-
-function renderSupportLog(){
-  if(!currentUser.supports) currentUser.supports = [];
-  document.getElementById('supportLog').innerHTML = "<h4>Support Tickets:</h4>" + 
-    currentUser.supports.map(m => `<p>${m}</p>`).join('');
-}
-
-// ===================== Balance =====================
-function renderBalance(){
-  document.getElementById('balanceDisplay').innerText = currentUser.balance || 0;
-}
-
-// Initial render
 renderLinks();
-renderWithdrawLog();
-renderSupportLog();
-renderBalance();
 </script>
-
 </body>
 </html>
