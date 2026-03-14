@@ -2,170 +2,87 @@
 <html lang="ar">
 <head>
 <meta charset="UTF-8">
-<title>Smartlink & Ads</title>
-
+<title>Shashort - Sign Up</title>
 <style>
 body{
   font-family: Arial;
-  text-align: center;
   background: #f4f4f4;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
 }
-
 .container{
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  flex-wrap: wrap;
-  margin: 30px 0;
+  background:white;
+  padding:30px;
+  border-radius:12px;
+  box-shadow:0 0 15px rgba(0,0,0,0.2);
+  width:400px;
+  text-align:center;
 }
-
-.ad{
-  width: 160px;
-  height: 300px;
-  border: 1px solid #ccc;
+h1{ margin-bottom:20px; }
+input{
+  width:80%;
+  padding:10px;
+  margin:10px 0;
+  border-radius:5px;
+  border:1px solid #ccc;
 }
-
 button{
-  margin: 20px;
-  padding: 15px 40px;
-  font-size: 20px;
-  background: #2ecc71;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
+  padding:10px 30px;
+  background:#2ecc71;
+  border:none;
+  border-radius:6px;
+  color:white;
+  font-size:16px;
+  cursor:pointer;
+  margin-top:10px;
+}
+.notice{
+  background:#f9edbe;
+  padding:10px;
+  border-radius:6px;
+  margin-bottom:15px;
+  font-size:14px;
+  color:#856404;
 }
 </style>
-
 </head>
-
 <body>
 
-<h1>مرحبا</h1>
-
-<!-- 4 banners فوق -->
 <div class="container">
-<div class="ad">
+  <h1>Shashort - Sign Up</h1>
+  <div class="notice">
+    المنصة تستعمل: Vodafone Cash, Orange Cash, WePay, InstaPay فقط
+  </div>
+
+  <input type="text" id="signupName" placeholder="اسمك الكامل" required>
+  <input type="text" id="signupWhatsapp" placeholder="رقم واتساب" required>
+  <input type="password" id="signupPass" placeholder="كلمة المرور" required>
+  <button onclick="signup()">Sign Up</button>
+  <p>لديك حساب؟ <a href="signin.html">Login</a></p>
+</div>
+
+<script src="storage.js"></script>
 <script>
-atOptions = {
-'key':'1b6d063030f9a97f69978bbeabea752e',
-'format':'iframe',
-'height':300,
-'width':160,
-'params':{}
-};
-</script>
-<script src="//www.highperformanceformat.com/1b6d063030f9a97f69978bbeabea752e/invoke.js"></script>
-</div>
+function signup(){
+  const name = document.getElementById('signupName').value;
+  const whatsapp = document.getElementById('signupWhatsapp').value;
+  const pass = document.getElementById('signupPass').value;
 
-<div class="ad">
-<script>
-atOptions = {
-'key':'1b6d063030f9a97f69978bbeabea752e',
-'format':'iframe',
-'height':300,
-'width':160,
-'params':{}
-};
-</script>
-<script src="//www.highperformanceformat.com/1b6d063030f9a97f69978bbeabea752e/invoke.js"></script>
-</div>
+  if(!name || !whatsapp || !pass){
+    alert("اكمل كل البيانات!");
+    return;
+  }
 
-<div class="ad">
-<script>
-atOptions = {
-'key':'1b6d063030f9a97f69978bbeabea752e',
-'format':'iframe',
-'height':300,
-'width':160,
-'params':{}
-};
-</script>
-<script src="//www.highperformanceformat.com/1b6d063030f9a97f69978bbeabea752e/invoke.js"></script>
-</div>
+  if(Storage.findUser(whatsapp)){
+    alert("رقم الواتساب مستخدم من قبل!");
+    return;
+  }
 
-<div class="ad">
-<script>
-atOptions = {
-'key':'1b6d063030f9a97f69978bbeabea752e',
-'format':'iframe',
-'height':300,
-'width':160,
-'params':{}
-};
-</script>
-<script src="//www.highperformanceformat.com/1b6d063030f9a97f69978bbeabea752e/invoke.js"></script>
-</div>
-</div>
-
-<!-- زر Smartlink -->
-<button onclick="window.open('https://www.effectivegatecpm.com/abue3ptame?key=6d93c92516e484a867b73322e5d9db48','_blank')">
-Smartlink
-</button>
-
-<!-- زر Pop‑under -->
-<button onclick="startPopUnder()">Pop‑under</button>
-
-<!-- 4 banners تحت -->
-<div class="container">
-<div class="ad">
-<script>
-atOptions = {
-'key':'1b6d063030f9a97f69978bbeabea752e',
-'format':'iframe',
-'height':300,
-'width':160,
-'params':{}
-};
-</script>
-<script src="//www.highperformanceformat.com/1b6d063030f9a97f69978bbeabea752e/invoke.js"></script>
-</div>
-
-<div class="ad">
-<script>
-atOptions = {
-'key':'1b6d063030f9a97f69978bbeabea752e',
-'format':'iframe',
-'height':300,
-'width':160,
-'params':{}
-};
-</script>
-<script src="//www.highperformanceformat.com/1b6d063030f9a97f69978bbeabea752e/invoke.js"></script>
-</div>
-
-<div class="ad">
-<script>
-atOptions = {
-'key':'1b6d063030f9a97f69978bbeabea752e',
-'format':'iframe',
-'height':300,
-'width':160,
-'params':{}
-};
-</script>
-<script src="//www.highperformanceformat.com/1b6d063030f9a97f69978bbeabea752e/invoke.js"></script>
-</div>
-
-<div class="ad">
-<script>
-atOptions = {
-'key':'1b6d063030f9a97f69978bbeabea752e',
-'format':'iframe',
-'height':300,
-'width':160,
-'params':{}
-};
-</script>
-<script src="//www.highperformanceformat.com/1b6d063030f9a97f69978bbeabea752e/invoke.js"></script>
-</div>
-</div>
-
-<script>
-function startPopUnder(){
-  var s = document.createElement("script");
-  s.src = "https://pl28914084.effectivegatecpm.com/a6/4e/72/a64e720088680caaa8d423bfb9bed7b2.js";
-  document.body.appendChild(s);
+  Storage.saveUser({phone:whatsapp, name:name, pass:pass, role:"user", balance:0, links:[]});
+  alert("تم التسجيل بنجاح!");
+  window.location.href = "signin.html";
 }
 </script>
 
