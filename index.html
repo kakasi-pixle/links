@@ -2,126 +2,64 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Shashort - Sign Up</title>
+<title>Flow Page</title>
 <style>
-body {
-  font-family: Arial, sans-serif;
-  background: #f0f2f5;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
-}
-
-.container{
-  background:white;
-  padding:30px;
-  border-radius:12px;
-  box-shadow:0 0 20px rgba(0,0,0,0.2);
-  width:400px;
-  text-align:center;
-}
-
-h1{
-  margin-bottom:20px;
-}
-
-input{
-  width:90%;
-  padding:10px;
-  margin:8px 0;
-  border-radius:6px;
-  border:1px solid #ccc;
-}
-
-button{
-  padding:12px 40px;
-  background:#2ecc71;
-  border:none;
-  border-radius:6px;
-  color:white;
-  font-size:16px;
-  cursor:pointer;
-  margin-top:10px;
-}
-
-.notice{
-  background:#f9edbe;
-  padding:10px;
-  border-radius:6px;
-  margin-bottom:15px;
-  font-size:14px;
-  color:#856404;
-}
+body{ font-family: Arial; display:flex; justify-content:center; align-items:center; height:100vh; background:#f0f2f5; margin:0;}
+.container{ background:white; padding:30px; border-radius:12px; box-shadow:0 0 20px rgba(0,0,0,0.2); width:600px; text-align:center; }
+h1{ margin-bottom:15px; }
+img{ width:80px; height:80px; margin:5px; }
+button{ padding:10px 20px; margin:10px; cursor:pointer; background:#3498db; color:white; border:none; border-radius:6px; }
+#adsTop, #adsBottom{ display:flex; justify-content:center; flex-wrap:wrap; margin:10px 0;}
 </style>
 </head>
 <body>
-
 <div class="container">
-  <h1>Create Your Account</h1>
-  <div class="notice">
-    المنصة تستعمل: Vodafone Cash, Orange Cash, WePay, InstaPay فقط
-  </div>
+  <h1>Flow Page</h1>
 
-  <input type="text" id="username" placeholder="Username" required>
-  <input type="email" id="email" placeholder="Email" required>
-  <input type="text" id="phone" placeholder="Phone" required>
-  <input type="password" id="password" placeholder="Password" required>
-  <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
-  <button onclick="createAccount()">Create Account</button>
+  <div id="adsTop"></div>
 
-  <p>Already have an account? <a href="signin.html">Login</a></p>
+  <button onclick="openSmartLink()">Smart Link</button>
+  <button onclick="openPopUnder()">Pop-under</button>
+
+  <div id="adsBottom"></div>
 </div>
 
-<script src="storage.js"></script>
 <script>
-function createAccount(){
-  const username = document.getElementById('username').value.trim();
-  const email = document.getElementById('email').value.trim();
-  const phone = document.getElementById('phone').value.trim();
-  const password = document.getElementById('password').value;
-  const confirmPassword = document.getElementById('confirmPassword').value;
+// 5 صور فوق + 5 صور تحت
+let topImages = [
+  "https://via.placeholder.com/80?text=1",
+  "https://via.placeholder.com/80?text=2",
+  "https://via.placeholder.com/80?text=3",
+  "https://via.placeholder.com/80?text=4",
+  "https://via.placeholder.com/80?text=5"
+];
+let bottomImages = [
+  "https://via.placeholder.com/80?text=6",
+  "https://via.placeholder.com/80?text=7",
+  "https://via.placeholder.com/80?text=8",
+  "https://via.placeholder.com/80?text=9",
+  "https://via.placeholder.com/80?text=10"
+];
 
-  if(!username || !email || !phone || !password || !confirmPassword){
-    alert("Complete all fields!");
-    return;
-  }
+let adsTop = document.getElementById("adsTop");
+let adsBottom = document.getElementById("adsBottom");
 
-  if(password !== confirmPassword){
-    alert("Passwords do not match!");
-    return;
-  }
+topImages.forEach(src=>{ let img=document.createElement("img"); img.src=src; adsTop.appendChild(img); });
+bottomImages.forEach(src=>{ let img=document.createElement("img"); img.src=src; adsBottom.appendChild(img); });
 
-  if(Storage.findUserByUsername(username)){
-    alert("Username already taken!");
-    return;
-  }
+// الروابط
+let smartLink = "https://www.effectivegatecpm.com/abue3ptame?key=6d93c92516e484a867b73322e5d9db48";
+let popUnderLink = "https://www.effectivegatecpm.com/abue3ptame?key=6d93c92516e484a867b73322e5d9db48";
 
-  if(Storage.findUserByEmail(email)){
-    alert("Email already used!");
-    return;
-  }
+function openSmartLink(){
+  window.open(smartLink,"_blank");
+  alert("Smart Link clicked!");
+}
 
-  if(Storage.findUserByPhone(phone)){
-    alert("Phone already used!");
-    return;
-  }
-
-  const user = {
-    username,
-    email,
-    phone,
-    pass: password,
-    role: "user",
-    balance:0,
-    links:[]
-  };
-
-  Storage.saveUser(user);
-  alert("Account created successfully!");
-  window.location.href = "signin.html";
+function openPopUnder(){
+  window.open(popUnderLink,"_blank");
+  alert("Pop-under clicked!");
 }
 </script>
-
 </body>
 </html>
