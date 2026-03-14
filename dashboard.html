@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>User Dashboard</title>
+<style>
+body{
+  font-family: Arial, sans-serif;
+  background:#f0f2f5;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  min-height:100vh;
+  padding-top:50px;
+}
+
+.container{
+  background:white;
+  padding:30px;
+  border-radius:12px;
+  box-shadow:0 0 20px rgba(0,0,0,0.2);
+  width:500px;
+}
+
+h2{margin-bottom:20px;}
+input, select, button{
+  width:90%;
+  padding:10px;
+  margin:8px 0;
+  border-radius:6px;
+  border:1px solid #ccc;
+}
+button{
+  background:#2ecc71;
+  color:white;
+  border:none;
+  cursor:pointer;
+}
+hr{margin:20px 0;}
+</style>
+</head>
+<body>
+
+<div class="container" id="dashboard">
+  <h2>Hello, <span id="usernameDisplay"></span></h2>
+  <p>Balance: $<span id="balanceDisplay">0</span></p>
+
+  <h3>Create Short Link</h3>
+  <input type="text" id="shortUrlInput" placeholder="Paste your URL" value="http://links-nine-livid.vercel.app/">
+  <input type="text" id="alainsInput" placeholder="Alains (e.g., xeno)">
+  <button onclick="createShort()">Create Link</button>
+  <div id="userLinks"></div>
+  
+  <hr>
+  <h3>Withdraw</h3>
+  <select id="withdrawMethod">
+    <option value="">Select Withdraw Method</option>
+    <option value="InstaPay">InstaPay</option>
+    <option value="Orange Cash">Orange Cash</option>
+    <option value="Vodafone Cash">Vodafone Cash</option>
+  </select>
+  <input type="text" id="withdrawAccount" placeholder="Account Number">
+  <button onclick="withdraw()">Withdraw</button>
+  <div id="withdrawLog"></div>
+</div>
+
+<script src="storage.js"></script>
+<script>
+let currentUser;
+
+// هنا افترض اننا جايين من login
+// مثلا نحدد المستخدم الحالي (username موجود في LocalStorage)
+// ممكن تعدل حسب نظامك
+currentUser = Storage.getUsers()[0]; // للتجربة، ناخد أول مستخدم
+document.getElementById('usernameDisplay').innerText = currentUser.username;
+document.getElementById('balanceDisplay').innerText = currentUser.balance;
+
+// إنشاء Short Link
+function createShort(){
+  const url = document.getElementById('shortUrlInput').value;
+  const alains = document.getElementById('alainsInput').value.trim();
+  if(!url || !alains) return alert("Enter URL and Alains!");
+
+  const shortLink = url + alains;
+  currentUser.links.push(shortLink);
+
+  // زيادة الرصيد تلقائيًا عند إنشاء رابط جديد
+  currentUser.balance += 1; // كم دولار لكل رابط جديد
+
+  updateStorage();
+  renderLinks();
+  renderBalance();
+  alert("Short Link Created: " + shortLink);
+}
+
+function renderLinks(){
+  document.getElementById('userLinks').innerHTML = "<h4>Your Links:</h4>" + 
+    currentUser.links.map(l => `<p>${l}</p>`).join('');
+}
+
+function renderBalance(){
+  document.getElementById('balanceDisplay').innerText = currentUser.balance;
+}
+
+// Withdraw
+function withdraw(){
+  const method = document.getElementById('withdrawMethod').value;
+  const account = document.getElementById('withdrawAccount').value.trim();
+  if(!method || !account) return alert("Select method and enter account!");
+
+  // حفظ السحب للمراجعة من Admin
+  if(!currentUser.withdraws) currentUser.withdraws = [];
+  currentUser.withdraws.push({method, account, amount: currentUser.balance});
+  
+  // تصفير الرصيد بعد سحب
+  currentUser.balance = 0;
+
+  updateStorage();
+  renderBalance();
+  renderWithdrawLog();
+  alert("Withdraw Requested Successfully!");
+}
+
+function renderWithdrawLog(){
+  if(!currentUser.withdraws) return;
+  const log = currentUser.withdraws.map(w => `<p>${w.amount}$ via ${w.method} to ${w.account}</p>`).join('');
+  document.getElementById('withdrawLog').innerHTML = "<h4>Withdraw Log:</h4>" + log;
+}
+
+// تحديث LocalStorage
+function updateStorage(){
+  const allUsers = Storage.getUsers();
+  const index = allUsers.findIndex(u => u.username === currentUser.username);
+  if(index !== -1) allUsers[index] = currentUser;
+  localStorage.setItem("shashort_users_secure", JSON.stringify(allUsers));
+}
+
+renderLinks();
+renderWithdrawLog();
+</script>
+
+</body>
+</html>
