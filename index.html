@@ -1,139 +1,74 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>GOLD AI SIGNAL 10s</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shawarma Shorter - Ads Page</title>
 <style>
-body {
-  background: #000;
-  color: #fff;
-  font-family: Arial, sans-serif;
-  text-align: center;
-  padding-top: 30px;
-}
-#signal {
-  font-size: 70px;
-  margin-top: 50px;
-}
-#price {
-  font-size: 25px;
-  margin-top: 15px;
-}
-.up { color: #00ff00; }
-.down { color: #ff4c4c; }
+  body { font-family: Arial, sans-serif; background: #fff; margin: 20px; }
+  .ads-row { display: flex; justify-content: space-between; margin-bottom: 15px; flex-wrap: wrap; }
+  .ad-slot { width: 18%; min-width: 120px; height: 160px; background: #f2f2f2; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
+  .short-link { text-align: center; margin: 40px 0; }
+  .short-link button { padding: 15px 30px; background: #ff5722; color: #fff; border: none; font-size: 18px; cursor: pointer; }
 </style>
 </head>
-
 <body>
 
-<h2>🔮 GOLD SIGNAL 10s</h2>
+<h2>Top 5 Banner Ads</h2>
+<div class="ads-row" id="top-ads">
+  <div class="ad-slot" id="top-ad-1"></div>
+  <div class="ad-slot" id="top-ad-2"></div>
+  <div class="ad-slot" id="top-ad-3"></div>
+  <div class="ad-slot" id="top-ad-4"></div>
+  <div class="ad-slot" id="top-ad-5"></div>
+</div>
 
-<div id="price">جاري التحميل...</div>
-<div id="signal">--</div>
+<div class="short-link">
+  <button id="short-link-btn">Go to Short Link</button>
+</div>
 
-<audio id="beep">
-  <source src="https://www.soundjay.com/buttons/sounds/beep-07.mp3">
-</audio>
+<h2>Bottom 5 Banner Ads</h2>
+<div class="ads-row" id="bottom-ads">
+  <div class="ad-slot" id="bottom-ad-1"></div>
+  <div class="ad-slot" id="bottom-ad-2"></div>
+  <div class="ad-slot" id="bottom-ad-3"></div>
+  <div class="ad-slot" id="bottom-ad-4"></div>
+  <div class="ad-slot" id="bottom-ad-5"></div>
+</div>
 
 <script>
+  // Array of top and bottom ad slots
+  const topAds = ['top-ad-1','top-ad-2','top-ad-3','top-ad-4','top-ad-5'];
+  const bottomAds = ['bottom-ad-1','bottom-ad-2','bottom-ad-3','bottom-ad-4','bottom-ad-5'];
 
-// جمع الأسعار للمؤشرات
-let prices = [];
+  // Adsterra / HighPerformanceFormat code
+  const adCode = `<script>
+    atOptions = {
+      'key' : '1b6d063030f9a97f69978bbeabea752e',
+      'format' : 'iframe',
+      'height' : 300,
+      'width' : 160,
+      'params' : {}
+    };
+  </script>
+  <script src="https://www.highperformanceformat.com/1b6d063030f9a97f69978bbeabea752e/invoke.js"></script>`;
 
-// حساب EMA
-function EMA(data, period) {
-  if (data.length < period) return null;
-  let k = 2 / (period + 1), ema = data[0];
-  for (let i = 1; i < data.length; i++) {
-    ema = data[i] * k + ema * (1 - k);
-  }
-  return ema;
-}
-
-// حساب RSI
-function RSI(data, period = 14) {
-  if (data.length < period) return null;
-  let gains = 0, losses = 0;
-  for (let i = 1; i < period; i++) {
-    let diff = data[i] - data[i - 1];
-    if (diff > 0) gains += diff;
-    else losses -= diff;
-  }
-  let rs = gains / (losses || 1);
-  return 100 - (100 / (1 + rs));
-}
-
-// حساب Momentum
-function MOM(data) {
-  if (data.length < 2) return 0;
-  return data[data.length - 1] - data[data.length - 2];
-}
-
-// مصدر سعر لحظي بدون مفتاح
-async function getGoldPrice() {
-  try {
-    let response = await fetch("https://api.metals.live/v1/spot");
-    let data = await response.json();
-    return data[0].gold;
-  } catch (e) {
-    console.error("خطأ في جلب السعر:", e);
-    return null;
-  }
-}
-
-// تحليل ذكي
-function analyze(price) {
-  prices.push(price);
-  if (prices.length > 60) prices.shift(); // نحتفظ بـ60 نقطة
-
-  let ema10 = EMA(prices.slice(-10), 10);
-  let ema20 = EMA(prices.slice(-20), 20);
-  let rsi = RSI(prices);
-  let mom = MOM(prices);
-
-  if (!ema10 || !ema20 || !rsi) return "UP";
-
-  // score بسيط وحقيقي
-  let score = 0;
-
-  if (ema10 > ema20) score++;
-  else score--;
-
-  if (rsi < 30) score++;
-  if (rsi > 70) score--;
-
-  if (mom > 0) score++;
-  else score--;
-
-  return score >= 1 ? "UP" : "DOWN";
-}
-
-let lastSignal = "";
-
-// التحديث كل 10 ثواني
-async function updateSignal() {
-  let price = await getGoldPrice();
-  if (!price) return;
-
-  document.getElementById("price").innerHTML = "السعر الحالي: " + price.toFixed(2);
-
-  let signal = analyze(price);
-  let display = signal == "UP"
-    ? '<span class="up">⬆️ ارفع</span>'
-    : '<span class="down">⬇️ انزل</span>';
-
-  document.getElementById("signal").innerHTML = display;
-
-  if (signal !== lastSignal) {
-    document.getElementById("beep").play();
-    lastSignal = signal;
+  function insertAd(adId, code){
+    const el = document.getElementById(adId);
+    if(el) el.innerHTML = code;
   }
 
-  setTimeout(updateSignal, 10000); // كل 10 ثواني
-}
+  // Inject ads into all slots
+  topAds.forEach(id => insertAd(id, adCode));
+  bottomAds.forEach(id => insertAd(id, adCode));
 
-updateSignal();
-
+  // Short link button with 10s timer before redirect
+  document.getElementById('short-link-btn').addEventListener('click', function(){
+    alert('Redirect will start in 10 seconds.');
+    setTimeout(() => {
+      window.location.href = 'https://example.com/your-short-link'; // Replace with actual short link
+    }, 10000);
+  });
 </script>
 
 </body>
