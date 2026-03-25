@@ -3,50 +3,45 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Shawarma Shorter - Ads Page</title>
+<title>Shawarma Shorter - Ads Grid</title>
 <style>
   body { font-family: Arial, sans-serif; background: #fff; margin: 20px; }
-  .ads-row { display: flex; justify-content: space-between; margin-bottom: 15px; flex-wrap: wrap; }
-  .ad-slot { width: 18%; min-width: 120px; height: 160px; background: #f2f2f2; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
+  .ads-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 40px; }
+  .ad-slot { width: 100%; height: 160px; background: #f2f2f2; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; }
   .short-link { text-align: center; margin: 40px 0; }
   .short-link button { padding: 15px 30px; background: #ff5722; color: #fff; border: none; font-size: 18px; cursor: pointer; }
 </style>
 </head>
 <body>
 
-<h2>Top 5 Banner Ads</h2>
-<div class="ads-row" id="top-ads">
-  <div class="ad-slot" id="top-ad-1"></div>
-  <div class="ad-slot" id="top-ad-2"></div>
-  <div class="ad-slot" id="top-ad-3"></div>
-  <div class="ad-slot" id="top-ad-4"></div>
-  <div class="ad-slot" id="top-ad-5"></div>
+<h2>Banner Ads Grid</h2>
+<div class="ads-grid" id="ads-grid">
+  <div class="ad-slot" id="ad-1"></div>
+  <div class="ad-slot" id="ad-2"></div>
+  <div class="ad-slot" id="ad-3"></div>
+  <div class="ad-slot" id="ad-4"></div>
+  <div class="ad-slot" id="ad-5"></div>
+  <div class="ad-slot" id="ad-6"></div>
+  <div class="ad-slot" id="ad-7"></div>
+  <div class="ad-slot" id="ad-8"></div>
+  <div class="ad-slot" id="ad-9"></div>
+  <div class="ad-slot" id="ad-10"></div>
 </div>
 
 <div class="short-link">
   <button id="short-link-btn">Go to Short Link</button>
 </div>
 
-<h2>Bottom 5 Banner Ads</h2>
-<div class="ads-row" id="bottom-ads">
-  <div class="ad-slot" id="bottom-ad-1"></div>
-  <div class="ad-slot" id="bottom-ad-2"></div>
-  <div class="ad-slot" id="bottom-ad-3"></div>
-  <div class="ad-slot" id="bottom-ad-4"></div>
-  <div class="ad-slot" id="bottom-ad-5"></div>
-</div>
-
 <script>
-  // List of ad slots
-  const topAds = ['top-ad-1','top-ad-2','top-ad-3','top-ad-4','top-ad-5'];
-  const bottomAds = ['bottom-ad-1','bottom-ad-2','bottom-ad-3','bottom-ad-4','bottom-ad-5'];
+  const adSlots = [
+    'ad-1','ad-2','ad-3','ad-4','ad-5',
+    'ad-6','ad-7','ad-8','ad-9','ad-10'
+  ];
 
-  // Function to create Adsterra script dynamically
   function loadAd(adId){
     const el = document.getElementById(adId);
     if(!el) return;
 
-    // Create the atOptions script
     const atScript = document.createElement('script');
     atScript.innerHTML = `
       atOptions = {
@@ -58,21 +53,17 @@
       };`;
     el.appendChild(atScript);
 
-    // Create the invoke.js script
     const invokeScript = document.createElement('script');
     invokeScript.src = 'https://www.highperformanceformat.com/1b6d063030f9a97f69978bbeabea752e/invoke.js';
     el.appendChild(invokeScript);
   }
 
-  // Load ads in all slots
-  topAds.forEach(loadAd);
-  bottomAds.forEach(loadAd);
+  adSlots.forEach(loadAd);
 
-  // Short Link button with 10s timer
   document.getElementById('short-link-btn').addEventListener('click', function(){
     alert('Redirect will start in 10 seconds.');
     setTimeout(() => {
-      window.location.href = 'https://example.com/your-short-link'; // ضع هنا اللينك الحقيقي
+      window.location.href = 'https://example.com/your-short-link';
     }, 10000);
   });
 </script>
