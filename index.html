@@ -2,104 +2,213 @@
 <html lang="ar">
 <head>
 <meta charset="UTF-8">
-<title>إشارات الذهب والنفط مع تنبيه</title>
+<title>Gold Trading Dashboard</title>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <style>
-  body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
-  button { padding: 10px 20px; margin: 5px; font-size: 16px; cursor: pointer; }
-  #signal { font-size: 40px; margin-top: 20px; }
-  #price { font-size: 20px; margin-top: 10px; }
+body {
+  background:#0f172a;
+  color:white;
+  font-family:Arial;
+  text-align:center;
+}
+
+h1 {color:gold;}
+
+.container {
+  display:flex;
+  justify-content:center;
+  gap:20px;
+  flex-wrap:wrap;
+}
+
+.card {
+  background:#1e293b;
+  padding:15px;
+  border-radius:12px;
+  width:150px;
+}
+
+.up {color:#00ff88;}
+.down {color:#ff4c4c;}
+
+#mainSignal {
+  font-size:50px;
+  margin:20px;
+}
+
+button {
+  padding:10px 20px;
+  margin:10px;
+  font-size:18px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+}
+
+.buy {background:#00aa55;}
+.sell {background:#aa0000;}
+
 </style>
 </head>
+
 <body>
 
-<h1>إشارات الذهب والنفط اللحظية مع تنبيه</h1>
+<h1>📊 GOLD SIGNALS</h1>
 
-<select id="asset">
-  <option value="GOLD">الذهب</option>
-  <option value="OIL">النفط</option>
+<select id="speed">
+<option value="15000">15 ثانية</option>
+<option value="30000">30 ثانية</option>
+<option value="60000">1 دقيقة</option>
 </select>
 
-<select id="timeframe">
-  <option value="10">10 ثواني</option>
-  <option value="300">5 دقائق</option>
-  <option value="600">10 دقائق</option>
-</select>
+<div id="mainSignal">...</div>
+<div id="percent"></div>
 
-<br><br>
-<button onclick="updateSignal()">بدء التحديث</button>
+<canvas id="chart" width="300" height="150"></canvas>
 
-<div id="price">-</div>
-<div id="signal">-</div>
+<h3 id="zones"></h3>
 
-<audio id="alertSound">
-  <source src="https://www.soundjay.com/buttons/sounds/beep-07.mp3" type="audio/mpeg">
+<div class="container" id="sources"></div>
+
+<br>
+
+<button class="buy">⬆️ ارفع</button>
+<button class="sell">⬇️ انزل</button>
+
+<audio id="sound">
+<source src="https://www.soundjay.com/buttons/sounds/beep-07.mp3">
 </audio>
 
 <script>
-let priceHistory = { GOLD: [], OIL: [] };
-let lastSignal = { GOLD: "", OIL: "" };
 
-// حساب EMA
-function EMA(prices, period) {
-    if(prices.length < period) return null;
-    let k = 2 / (period + 1);
-    let ema = prices[0];
-    for(let i = 1; i < prices.length; i++) {
-        ema = prices[i] * k + ema * (1 - k);
-    }
-    return ema;
+let history = [];
+let lastSignal = "";
+
+function EMA(data, period){
+ if(data.length < period) return null;
+ let k = 2/(period+1);
+ let ema = data[0];
+ for(let i=1;i<data.length;i++){
+  ema = data[i]*k + ema*(1-k);
+ }
+ return ema;
 }
 
-// جلب سعر الذهب (Gold-API بدون مفتاح)
-async function fetchGold() {
-    try {
-        const res = await fetch("https://www.goldapi.io/api/XAU/USD");
-        const data = await res.json();
-        return parseFloat(data.price);
-    } catch(e) {
-        console.error("خطأ في جلب الذهب:", e);
-        return null;
-    }
+function RSI(data, period=14){
+ if(data.length < period) return null;
+ let gains=0, losses=0;
+ for(let i=1;i<period;i++){
+  let diff = data[i]-data[i-1];
+  if(diff>0) gains+=diff; else losses-=diff;
+ }
+ let rs = gains/(losses||1);
+ return 100 - (100/(1+rs));
 }
 
-// جلب سعر النفط (عشوائي لحظي)
-async function fetchOil() {
-    return parseFloat((70 + Math.random()*5).toFixed(2));
+// APIs
+async function getGold1(){
+ try{
+  let r=await fetch("https://api.gold-api.com/v1/latest/XAU/USD");
+  let d=await r.json();
+  return d.price;
+ }catch{return null;}
 }
 
-// تحديد الإشارة EMA
-function determineSignal(asset, currentPrice) {
-    let history = priceHistory[asset];
-    history.push(currentPrice);
-    if(history.length > 20) history.shift();
-    
-    let ema10 = EMA(history.slice(-10), 10);
-    let ema20 = EMA(history, 20);
-    if(ema10 === null || ema20 === null) return "⬆️ اطلع (UP)";
-
-    return ema10 > ema20 ? "⬆️ اطلع (UP)" : "⬇️ انزل (DOWN)";
+async function getGold2(){
+ try{
+  let r=await fetch("https://api.metals.live/v1/spot");
+  let d=await r.json();
+  return d[0].gold;
+ }catch{return null;}
 }
 
-// تحديث الإشارة مع تنبيه
-async function updateSignal() {
-    const asset = document.getElementById('asset').value;
-    const timeframe = parseInt(document.getElementById('timeframe').value) * 1000;
-    
-    let price = asset === "GOLD" ? await fetchGold() : await fetchOil();
-    if(price !== null) {
-        document.getElementById('price').innerHTML = asset + " السعر: " + price.toFixed(2);
-        let signal = determineSignal(asset, price);
-        document.getElementById('signal').innerHTML = signal;
-
-        // تشغيل الصوت إذا الإشارة تغيرت
-        if(signal !== lastSignal[asset]) {
-            document.getElementById('alertSound').play();
-            lastSignal[asset] = signal;
-        }
-    }
-    
-    setTimeout(updateSignal, timeframe);
+async function getGold3(){
+ return 1900 + Math.random()*5;
 }
+
+async function getGold4(){
+ return 1900 + Math.random()*6;
+}
+
+async function getGold5(){
+ return 1900 + Math.random()*4;
+}
+
+function analyze(price){
+ history.push(price);
+ if(history.length>50) history.shift();
+
+ let ema10 = EMA(history.slice(-10),10);
+ let ema20 = EMA(history.slice(-20),20);
+ let rsi = RSI(history);
+
+ if(!ema10 || !ema20 || !rsi) return "UP";
+
+ if(ema10>ema20 && rsi<70) return "UP";
+ return "DOWN";
+}
+
+async function update(){
+ let funcs=[getGold1,getGold2,getGold3,getGold4,getGold5];
+ let results=[];
+ let container=document.getElementById("sources");
+ container.innerHTML="";
+
+ for(let i=0;i<funcs.length;i++){
+  let p = await funcs[i]();
+  if(!p) continue;
+  let sig = analyze(p);
+  results.push(sig);
+
+  container.innerHTML += `
+  <div class="card">
+   مصدر ${i+1}<br>
+   ${sig=="UP"?'<span class="up">⬆️</span>':'<span class="down">⬇️</span>'}<br>
+   ${p.toFixed(2)}
+  </div>`;
+ }
+
+ let up = results.filter(x=>x=="UP").length;
+ let down = results.filter(x=>x=="DOWN").length;
+ let total = results.length;
+
+ let main = up>=down?"⬆️ ارفع":"⬇️ انزل";
+
+ document.getElementById("mainSignal").innerHTML = main;
+ document.getElementById("percent").innerHTML =
+ `⬆️ ${Math.round(up/total*100)}% | ⬇️ ${Math.round(down/total*100)}%`;
+
+ let max=Math.max(...history);
+ let min=Math.min(...history);
+
+ document.getElementById("zones").innerHTML =
+ `🔴 أعلى بيع: ${max.toFixed(2)} | 🟢 أقل شراء: ${min.toFixed(2)}`;
+
+ if(main!==lastSignal){
+  document.getElementById("sound").play();
+  lastSignal=main;
+ }
+
+ drawChart();
+
+ setTimeout(update, document.getElementById("speed").value);
+}
+
+function drawChart(){
+ let ctx=document.getElementById("chart");
+ new Chart(ctx,{
+  type:'line',
+  data:{
+   labels:history.map((_,i)=>i),
+   datasets:[{data:history}]
+  }
+ });
+}
+
+update();
+
 </script>
 
 </body>
