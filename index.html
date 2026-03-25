@@ -2,26 +2,12 @@
 <html lang="ar">
 <head>
 <meta charset="UTF-8">
-<title>GOLD SIGNAL 10s</title>
+<title>AI GOLD 10s</title>
 
 <style>
-body{
- background:black;
- color:white;
- text-align:center;
- font-family:Arial;
-}
-
-#signal{
- font-size:70px;
- margin-top:50px;
-}
-
-#price{
- font-size:25px;
- margin:20px;
-}
-
+body{background:black;color:white;text-align:center;font-family:Arial;}
+#signal{font-size:70px;margin-top:50px;}
+#info{font-size:20px;margin-top:20px;}
 .up{color:#00ff00;}
 .down{color:#ff0000;}
 </style>
@@ -29,21 +15,17 @@ body{
 
 <body>
 
-<h2>📊 GOLD SIGNAL (10s)</h2>
+<h2>🤖 AI GOLD SIGNAL</h2>
 
-<div id="price">...</div>
 <div id="signal">...</div>
-
-<audio id="sound">
-<source src="https://www.soundjay.com/buttons/sounds/beep-07.mp3">
-</audio>
+<div id="info"></div>
 
 <script>
 
-let history=[];
+let prices=[];
 
 // EMA
-function EMA(data, p){
+function EMA(data,p){
  if(data.length<p) return null;
  let k=2/(p+1), ema=data[0];
  for(let i=1;i<data.length;i++){
@@ -65,13 +47,13 @@ function RSI(data,p=14){
 }
 
 // Momentum
-function momentum(data){
+function MOM(data){
  if(data.length<2) return 0;
- return data[data.length-1] - data[data.length-2];
+ return data[data.length-1]-data[data.length-2];
 }
 
-// مصدرين بدون مفتاح
-async function getPrice1(){
+// مصدر حقيقي بدون مفتاح
+async function getPrice(){
  try{
   let r=await fetch("https://api.metals.live/v1/spot");
   let d=await r.json();
@@ -79,69 +61,59 @@ async function getPrice1(){
  }catch{return null;}
 }
 
-async function getPrice2(){
- try{
-  let r=await fetch("https://api.gold-api.com/v1/latest/XAU/USD");
-  let d=await r.json();
-  return d.price;
- }catch{return null;}
-}
+// AI Logic
+function AI(price){
+ prices.push(price);
+ if(prices.length>50) prices.shift();
 
-// تحليل
-function analyze(price){
- history.push(price);
- if(history.length>50) history.shift();
-
- let ema10=EMA(history.slice(-10),10);
- let ema20=EMA(history.slice(-20),20);
- let rsi=RSI(history);
- let mom=momentum(history);
+ let ema10=EMA(prices.slice(-10),10);
+ let ema20=EMA(prices.slice(-20),20);
+ let rsi=RSI(prices);
+ let mom=MOM(prices);
 
  if(!ema10||!ema20||!rsi) return "UP";
 
  let score=0;
 
- if(ema10>ema20) score++;
- else score--;
+ // اتجاه
+ if(ema10>ema20) score+=2;
+ else score-=2;
 
- if(rsi<70) score++;
- else score--;
+ // قوة
+ if(rsi<30) score+=2;
+ else if(rsi>70) score-=2;
 
- if(mom>0) score++;
- else score--;
+ // حركة
+ if(mom>0) score+=1;
+ else score-=1;
+
+ // فلتر ذكي
+ let trend = prices[prices.length-1] > prices[0];
+
+ if(trend) score+=1;
+ else score-=1;
 
  return score>=1?"UP":"DOWN";
 }
 
-let lastSignal="";
-
-async function update(){
- let p1=await getPrice1();
- let p2=await getPrice2();
-
- let price = (p1 && p2) ? (p1+p2)/2 : (p1||p2);
-
+async function run(){
+ let price=await getPrice();
  if(!price) return;
 
- document.getElementById("price").innerHTML = "السعر: "+price.toFixed(2);
+ let result=AI(price);
 
- let signal = analyze(price);
-
- let text = signal=="UP"?
+ let text = result=="UP"?
  '<span class="up">⬆️ ارفع</span>' :
  '<span class="down">⬇️ انزل</span>';
 
- document.getElementById("signal").innerHTML = text;
+ document.getElementById("signal").innerHTML=text;
+ document.getElementById("info").innerHTML=
+ "السعر: "+price.toFixed(2);
 
- if(signal!==lastSignal){
-  document.getElementById("sound").play();
-  lastSignal=signal;
- }
-
- setTimeout(update,10000);
+ setTimeout(run,10000);
 }
 
-update();
+run();
 
 </script>
 
