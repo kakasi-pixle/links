@@ -2,17 +2,17 @@
 <html lang="ar">
 <head>
 <meta charset="UTF-8">
-<title>إشارات الذهب والنفط اللحظية</title>
+<title>إشارات الذهب والنفط مع تنبيه</title>
 <style>
   body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
   button { padding: 10px 20px; margin: 5px; font-size: 16px; cursor: pointer; }
-  #signal { font-size: 30px; margin-top: 20px; }
+  #signal { font-size: 40px; margin-top: 20px; }
   #price { font-size: 20px; margin-top: 10px; }
 </style>
 </head>
 <body>
 
-<h1>إشارات الذهب والنفط اللحظية</h1>
+<h1>إشارات الذهب والنفط اللحظية مع تنبيه</h1>
 
 <select id="asset">
   <option value="GOLD">الذهب</option>
@@ -26,15 +26,31 @@
 </select>
 
 <br><br>
-<button onclick="updateSignal()">عرض الإشارة</button>
+<button onclick="updateSignal()">بدء التحديث</button>
 
 <div id="price">-</div>
 <div id="signal">-</div>
 
-<script>
-let lastPrice = { GOLD: null, OIL: null };
+<audio id="alertSound">
+  <source src="https://www.soundjay.com/buttons/sounds/beep-07.mp3" type="audio/mpeg">
+</audio>
 
-// دالة لجلب سعر الذهب من Gold‑API (بدون مفتاح)
+<script>
+let priceHistory = { GOLD: [], OIL: [] };
+let lastSignal = { GOLD: "", OIL: "" };
+
+// حساب EMA
+function EMA(prices, period) {
+    if(prices.length < period) return null;
+    let k = 2 / (period + 1);
+    let ema = prices[0];
+    for(let i = 1; i < prices.length; i++) {
+        ema = prices[i] * k + ema * (1 - k);
+    }
+    return ema;
+}
+
+// جلب سعر الذهب (Gold-API بدون مفتاح)
 async function fetchGold() {
     try {
         const res = await fetch("https://www.goldapi.io/api/XAU/USD");
@@ -46,43 +62,44 @@ async function fetchGold() {
     }
 }
 
-// دالة لجلب سعر النفط (مثال لحظي مجاني عشوائي)
+// جلب سعر النفط (عشوائي لحظي)
 async function fetchOil() {
-    try {
-        return parseFloat((70 + Math.random()*5).toFixed(2));
-    } catch(e) {
-        console.error("خطأ في جلب النفط:", e);
-        return null;
-    }
+    return parseFloat((70 + Math.random()*5).toFixed(2));
 }
 
-// تحديد الإشارة Up/Down بدون HOLD
+// تحديد الإشارة EMA
 function determineSignal(asset, currentPrice) {
-    if (lastPrice[asset] === null) {
-        lastPrice[asset] = currentPrice;
-        return "⬆️ اطلع (UP)"; // إذا ما فيش تاريخ سابق نعتبر صاعد
-    }
-    let signal = currentPrice >= lastPrice[asset] ? "⬆️ اطلع (UP)" : "⬇️ انزل (DOWN)";
-    lastPrice[asset] = currentPrice;
-    return signal;
+    let history = priceHistory[asset];
+    history.push(currentPrice);
+    if(history.length > 20) history.shift();
+    
+    let ema10 = EMA(history.slice(-10), 10);
+    let ema20 = EMA(history, 20);
+    if(ema10 === null || ema20 === null) return "⬆️ اطلع (UP)";
+
+    return ema10 > ema20 ? "⬆️ اطلع (UP)" : "⬇️ انزل (DOWN)";
 }
 
-// تحديث الإشارة على الصفحة
+// تحديث الإشارة مع تنبيه
 async function updateSignal() {
     const asset = document.getElementById('asset').value;
     const timeframe = parseInt(document.getElementById('timeframe').value) * 1000;
     
     let price = asset === "GOLD" ? await fetchGold() : await fetchOil();
     if(price !== null) {
-        document.getElementById('price').innerHTML = asset + " السعر: " + price;
-        document.getElementById('signal').innerHTML = determineSignal(asset, price);
+        document.getElementById('price').innerHTML = asset + " السعر: " + price.toFixed(2);
+        let signal = determineSignal(asset, price);
+        document.getElementById('signal').innerHTML = signal;
+
+        // تشغيل الصوت إذا الإشارة تغيرت
+        if(signal !== lastSignal[asset]) {
+            document.getElementById('alertSound').play();
+            lastSignal[asset] = signal;
+        }
     }
     
-    // إعادة التحديث تلقائي حسب الوقت المحدد
     setTimeout(updateSignal, timeframe);
 }
-
-// تشغيل التحديث تلقائي عند الضغط على الزر
 </script>
 
 </body>
