@@ -46,10 +46,9 @@ async function fetchGold() {
     }
 }
 
-// دالة لجلب سعر النفط (نجرب Pineify أو بيانات وهمية مجانية)
+// دالة لجلب سعر النفط (مثال لحظي مجاني عشوائي)
 async function fetchOil() {
     try {
-        // هنا مثال سعر عشوائي بدل API لحظي مجاني مباشر
         return parseFloat((70 + Math.random()*5).toFixed(2));
     } catch(e) {
         console.error("خطأ في جلب النفط:", e);
@@ -57,14 +56,13 @@ async function fetchOil() {
     }
 }
 
-// تحديد الإشارة Up/Down
+// تحديد الإشارة Up/Down بدون HOLD
 function determineSignal(asset, currentPrice) {
     if (lastPrice[asset] === null) {
         lastPrice[asset] = currentPrice;
-        return "🟡 امسك (HOLD)";
+        return "⬆️ اطلع (UP)"; // إذا ما فيش تاريخ سابق نعتبر صاعد
     }
-    let signal = currentPrice > lastPrice[asset] ? "⬆️ اطلع (UP)" :
-                 currentPrice < lastPrice[asset] ? "⬇️ انزل (DOWN)" : "🟡 امسك (HOLD)";
+    let signal = currentPrice >= lastPrice[asset] ? "⬆️ اطلع (UP)" : "⬇️ انزل (DOWN)";
     lastPrice[asset] = currentPrice;
     return signal;
 }
