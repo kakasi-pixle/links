@@ -2,95 +2,52 @@
 <html lang="ar">
 <head>
 <meta charset="UTF-8">
-<title>Gold Live Signal</title>
+<title>GOLD SIGNAL 10s</title>
 
 <style>
 body{
- background:#0f172a;
+ background:black;
  color:white;
- font-family:Arial;
  text-align:center;
+ font-family:Arial;
 }
 
-h1{color:gold;}
-
 #signal{
- font-size:60px;
+ font-size:70px;
+ margin-top:50px;
+}
+
+#price{
+ font-size:25px;
  margin:20px;
 }
 
-#strength{
- font-size:25px;
- margin-bottom:20px;
-}
-
-.container{
- display:flex;
- justify-content:center;
- gap:20px;
-}
-
-.card{
- background:#1e293b;
- padding:15px;
- border-radius:10px;
- width:150px;
-}
-
-.up{color:#00ff88;}
-.down{color:#ff4c4c;}
+.up{color:#00ff00;}
+.down{color:#ff0000;}
 </style>
 </head>
 
 <body>
 
-<h1>📊 GOLD LIVE SIGNAL</h1>
+<h2>📊 GOLD SIGNAL (10s)</h2>
 
-<select id="speed">
-<option value="15000">15 ثانية</option>
-<option value="30000">30 ثانية</option>
-<option value="60000">1 دقيقة</option>
-</select>
-
+<div id="price">...</div>
 <div id="signal">...</div>
-<div id="strength"></div>
-
-<!-- TradingView Chart -->
-<div class="tradingview-widget-container">
-  <div id="tv_chart"></div>
-</div>
-
-<div class="container" id="sources"></div>
 
 <audio id="sound">
 <source src="https://www.soundjay.com/buttons/sounds/beep-07.mp3">
 </audio>
 
-<script src="https://s3.tradingview.com/tv.js"></script>
-
 <script>
 
-// TradingView Chart
-new TradingView.widget({
-  "width": "100%",
-  "height": 400,
-  "symbol": "OANDA:XAUUSD",
-  "interval": "1",
-  "timezone": "Etc/UTC",
-  "theme": "dark",
-  "style": "1",
-  "container_id": "tv_chart"
-});
-
 let history=[];
-let lastSignal="";
 
 // EMA
-function EMA(data,p){
+function EMA(data, p){
  if(data.length<p) return null;
  let k=2/(p+1), ema=data[0];
  for(let i=1;i<data.length;i++){
-  ema=data[i]*k+ema*(1-k);
+  ema=data[i]*k + ema*(1-k);
  }
  return ema;
 }
@@ -107,17 +64,27 @@ function RSI(data,p=14){
  return 100-(100/(1+rs));
 }
 
-// APIs حقيقية
-async function gold1(){
- let r=await fetch("https://api.gold-api.com/v1/latest/XAU/USD");
- let d=await r.json();
- return d.price;
+// Momentum
+function momentum(data){
+ if(data.length<2) return 0;
+ return data[data.length-1] - data[data.length-2];
 }
 
-async function gold2(){
- let r=await fetch("https://api.metals.live/v1/spot");
- let d=await r.json();
- return d[0].gold;
+// مصدرين بدون مفتاح
+async function getPrice1(){
+ try{
+  let r=await fetch("https://api.metals.live/v1/spot");
+  let d=await r.json();
+  return d[0].gold;
+ }catch{return null;}
+}
+
+async function getPrice2(){
+ try{
+  let r=await fetch("https://api.gold-api.com/v1/latest/XAU/USD");
+  let d=await r.json();
+  return d.price;
+ }catch{return null;}
 }
 
 // تحليل
@@ -128,42 +95,55 @@ function analyze(price){
  let ema10=EMA(history.slice(-10),10);
  let ema20=EMA(history.slice(-20),20);
  let rsi=RSI(history);
+ let mom=momentum(history);
 
  if(!ema10||!ema20||!rsi) return "UP";
 
- if(ema10>ema20 && rsi<70) return "UP";
- return "DOWN";
+ let score=0;
+
+ if(ema10>ema20) score++;
+ else score--;
+
+ if(rsi<70) score++;
+ else score--;
+
+ if(mom>0) score++;
+ else score--;
+
+ return score>=1?"UP":"DOWN";
 }
 
-// تحديث
+let lastSignal="";
+
 async function update(){
- let data=[];
- let s=document.getElementById("sources");
- s.innerHTML="";
+ let p1=await getPrice1();
+ let p2=await getPrice2();
 
- let p1=await gold1();
- let sig1=analyze(p1);
- data.push(sig1);
+ let price = (p1 && p2) ? (p1+p2)/2 : (p1||p2);
 
- s.innerHTML+=`
- <div class="card">
- GoldAPI<br>
- ${sig1=="UP"?'<span class="up">⬆️</span>':'<span class="down">⬇️</span>'}
- <br>${p1.toFixed(2)}
- </div>`;
+ if(!price) return;
 
- let p2=await gold2();
- let sig2=analyze(p2);
- data.push(sig2);
+ document.getElementById("price").innerHTML = "السعر: "+price.toFixed(2);
 
- s.innerHTML+=`
- <div class="card">
- Metals<br>
- ${sig2=="UP"?'<span class="up">⬆️</span>':'<span class="down">⬇️</span>'}
- <br>${p2.toFixed(2)}
- </div>`;
+ let signal = analyze(price);
 
- let up=data.filter(x=>x=="UP").length;
- let down=data.filter(x=>x=="DOWN").length;
+ let text = signal=="UP"?
+ '<span class="up">⬆️ ارفع</span>' :
+ '<span class="down">⬇️ انزل</span>';
 
- let final = up>=down?"⬆️ ارفع":"
+ document.getElementById("signal").innerHTML = text;
+
+ if(signal!==lastSignal){
+  document.getElementById("sound").play();
+  lastSignal=signal;
+ }
+
+ setTimeout(update,10000);
+}
+
+update();
+
+</script>
+
+</body>
+</html>
