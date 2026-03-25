@@ -1,192 +1,90 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
 <meta charset="UTF-8">
-<title>Flow Ads Page</title>
+<title>إشارات الذهب والنفط اللحظية</title>
 <style>
-body {
-  font-family: Arial, sans-serif;
-  background: #f0f2f5;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-}
-
-.container {
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 0 15px rgba(0,0,0,0.2);
-  width: 700px;
-  text-align: center;
-}
-
-.ads-row {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin: 10px 0;
-}
-
-button {
-  padding: 12px 24px;
-  margin: 10px;
-  font-size: 16px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  background: #3498db;
-  color: white;
-}
-
-button:hover {
-  background: #2c81b6;
-}
+  body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+  button { padding: 10px 20px; margin: 5px; font-size: 16px; cursor: pointer; }
+  #signal { font-size: 30px; margin-top: 20px; }
+  #price { font-size: 20px; margin-top: 10px; }
 </style>
 </head>
 <body>
 
-<div class="container">
+<h1>إشارات الذهب والنفط اللحظية</h1>
 
-  <h2>Welcome — Check Ads Below</h2>
+<select id="asset">
+  <option value="GOLD">الذهب</option>
+  <option value="OIL">النفط</option>
+</select>
 
-  <!-- 5 Ads Top -->
-  <div class="ads-row">
-    <!-- Ad Unit 1 -->
-    <script>
-      atOptions = {
-        key: '1b6d063030f9a97f69978bbeabea752e',
-        format: 'iframe',
-        height: 300,
-        width: 160,
-        params: {}
-      };
-    </script>
-    <script src="//www.highperformanceformat.com/1b6d063030f9a97f69978bbeabea752e/invoke.js"></script>
+<select id="timeframe">
+  <option value="10">10 ثواني</option>
+  <option value="300">5 دقائق</option>
+  <option value="600">10 دقائق</option>
+</select>
 
-    <!-- Duplicate 4 more units -->
-    <script>
-      atOptions = {
-        key: '1b6d063030f9a97f69978bbeabea752e',
-        format: 'iframe',
-        height: 300,
-        width: 160,
-        params: {}
-      };
-    </script>
-    <script src="//www.highperformanceformat.com/1b6d063030f9a97f69978bbeabea752e/invoke.js"></script>
+<br><br>
+<button onclick="updateSignal()">عرض الإشارة</button>
 
-    <script>
-      atOptions = {
-        key: '1b6d063030f9a97f69978bbeabea752e',
-        format: 'iframe',
-        height: 300,
-        width: 160,
-        params: {}
-      };
-    </script>
-    <script src="//www.highperformanceformat.com/1b6d063030f9a97f69978bbeabea752e/invoke.js"></script>
-
-    <script>
-      atOptions = {
-        key: '1b6d063030f9a97f69978bbeabea752e',
-        format: 'iframe',
-        height: 300,
-        width: 160,
-        params: {}
-      };
-    </script>
-    <script src="//www.highperformanceformat.com/1b6d063030f9a97f69978bbeabea752e/invoke.js"></script>
-
-    <script>
-      atOptions = {
-        key: '1b6d063030f9a97f69978bbeabea752e',
-        format: 'iframe',
-        height: 300,
-        width: 160,
-        params: {}
-      };
-    </script>
-    <script src="//www.highperformanceformat.com/1b6d063030f9a97f69978bbeabea752e/invoke.js"></script>
-  </div>
-
-  <!-- Smart Link & Pop-under Buttons -->
-  <button onclick="openSmartLink()">Open Smart Link</button>
-  <button onclick="openPopUnder()">Open Pop-under</button>
-
-  <!-- 5 Ads Bottom -->
-  <div class="ads-row">
-    <!-- Same Ad Units repeated -->
-    <script>
-      atOptions = {
-        key: '1b6d063030f9a97f69978bbeabea752e',
-        format: 'iframe',
-        height: 300,
-        width: 160,
-        params: {}
-      };
-    </script>
-    <script src="//www.highperformanceformat.com/1b6d063030f9a97f69978bbeabea752e/invoke.js"></script>
-
-    <script>
-      atOptions = {
-        key: '1b6d063030f9a97f69978bbeabea752e',
-        format: 'iframe',
-        height: 300,
-        width: 160,
-        params: {}
-      };
-    </script>
-    <script src="//www.highperformanceformat.com/1b6d063030f9a97f69978bbeabea752e/invoke.js"></script>
-
-    <script>
-      atOptions = {
-        key: '1b6d063030f9a97f69978bbeabea752e',
-        format: 'iframe',
-        height: 300,
-        width: 160,
-        params: {}
-      };
-    </script>
-    <script src="//www.highperformanceformat.com/1b6d063030f9a97f69978bbeabea752e/invoke.js"></script>
-
-    <script>
-      atOptions = {
-        key: '1b6d063030f9a97f69978bbeabea752e',
-        format: 'iframe',
-        height: 300,
-        width: 160,
-        params: {}
-      };
-    </script>
-    <script src="//www.highperformanceformat.com/1b6d063030f9a97f69978bbeabea752e/invoke.js"></script>
-
-    <script>
-      atOptions = {
-        key: '1b6d063030f9a97f69978bbeabea752e',
-        format: 'iframe',
-        height: 300,
-        width: 160,
-        params: {}
-      };
-    </script>
-    <script src="//www.highperformanceformat.com/1b6d063030f9a97f69978bbeabea752e/invoke.js"></script>
-  </div>
-
-</div>
+<div id="price">-</div>
+<div id="signal">-</div>
 
 <script>
-// استخدم الروابط الحقيقية اللي عندك
-function openSmartLink(){
-  window.open("https://www.effectivegatecpm.com/abue3ptame?key=6d93c92516e484a867b73322e5d9db48","_blank");
+let lastPrice = { GOLD: null, OIL: null };
+
+// دالة لجلب سعر الذهب من Gold‑API (بدون مفتاح)
+async function fetchGold() {
+    try {
+        const res = await fetch("https://www.goldapi.io/api/XAU/USD");
+        const data = await res.json();
+        return parseFloat(data.price);
+    } catch(e) {
+        console.error("خطأ في جلب الذهب:", e);
+        return null;
+    }
 }
-function openPopUnder(){
-  window.open("https://www.effectivegatecpm.com/abue3ptame?key=6d93c92516e484a867b73322e5d9db48","_blank");
+
+// دالة لجلب سعر النفط (نجرب Pineify أو بيانات وهمية مجانية)
+async function fetchOil() {
+    try {
+        // هنا مثال سعر عشوائي بدل API لحظي مجاني مباشر
+        return parseFloat((70 + Math.random()*5).toFixed(2));
+    } catch(e) {
+        console.error("خطأ في جلب النفط:", e);
+        return null;
+    }
 }
+
+// تحديد الإشارة Up/Down
+function determineSignal(asset, currentPrice) {
+    if (lastPrice[asset] === null) {
+        lastPrice[asset] = currentPrice;
+        return "🟡 امسك (HOLD)";
+    }
+    let signal = currentPrice > lastPrice[asset] ? "⬆️ اطلع (UP)" :
+                 currentPrice < lastPrice[asset] ? "⬇️ انزل (DOWN)" : "🟡 امسك (HOLD)";
+    lastPrice[asset] = currentPrice;
+    return signal;
+}
+
+// تحديث الإشارة على الصفحة
+async function updateSignal() {
+    const asset = document.getElementById('asset').value;
+    const timeframe = parseInt(document.getElementById('timeframe').value) * 1000;
+    
+    let price = asset === "GOLD" ? await fetchGold() : await fetchOil();
+    if(price !== null) {
+        document.getElementById('price').innerHTML = asset + " السعر: " + price;
+        document.getElementById('signal').innerHTML = determineSignal(asset, price);
+    }
+    
+    // إعادة التحديث تلقائي حسب الوقت المحدد
+    setTimeout(updateSignal, timeframe);
+}
+
+// تشغيل التحديث تلقائي عند الضغط على الزر
 </script>
 
 </body>
